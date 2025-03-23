@@ -1,0 +1,84 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Game Engine UI</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/",
+                "dat.gui": "https://cdn.jsdelivr.net/npm/dat.gui@0.7.9/build/dat.gui.module.js",
+                "tweakpane": "https://cdn.skypack.dev/tweakpane@3.1.0"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <div id="main-toolbar">
+            <div class="section">
+                <button id="new-scene">New Scene</button>
+                <button id="save-scene">Save Scene</button>
+                <button id="load-scene">Load Scene</button>
+            </div>
+            <div class="section">
+                <button id="main-add-cube">Cube</button>
+                <button id="main-add-sphere">Sphere</button>
+                <button id="main-add-light">Light</button>
+                <button id="main-add-camera">Camera</button>
+                <button id="main-add-script">Script</button>
+            </div>
+            <div class="section">
+                <button id="main-play">Play</button>
+                <button id="main-pause">Pause</button>
+                <button id="main-stop">Stop</button>
+                <button id="main-docs" onclick="window.open('docs.html', '_blank')">Documentation</button>
+            </div>
+        </div>
+        <div id="viewport"></div>
+        <div id="ui-panels">
+            <div class="panel" id="scene-hierarchy">
+                <div class="panel-header">
+                    <h3>Scene Hierarchy</h3>
+                </div>
+                <div class="panel-content">
+                    <ul id="scene-tree"></ul>
+                </div>
+            </div>
+        </div>
+        <div id="inspector" class="panel">
+            <div class="panel-header">
+                <h3>Inspector</h3>
+            </div>
+            <div class="panel-content" id="properties-container">
+                <div class="no-selection">No object selected</div>
+            </div>
+        </div>
+        <div id="assets-manager">
+            <div class="panel-header">
+                <h3>Assets Manager</h3>
+            </div>
+            <div class="panel-content" id="assets-container">
+                <div class="assets-grid"></div>
+            </div>
+        </div>
+        <div id="toolbar">
+            <button id="add-cube">Add Cube</button>
+            <button id="add-sphere">Add Sphere</button>
+            <button id="add-light">Add Light</button>
+            <button id="play-pause">▶ Play</button>
+        </div>
+        <div id="status-bar">
+            <div id="fps">FPS: 0</div>
+            <div id="object-count">Objects: 0</div>
+            <div id="engine-status">Status: Editor Mode</div>
+        </div>
+    </div>
+    <script type="module" src="config.js"></script>
+    <script type="module" src="engine.js"></script>
+    <script type="module" src="ui.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

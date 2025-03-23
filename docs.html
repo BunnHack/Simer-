@@ -1,0 +1,2510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Game Engine Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        
+        header {
+            background-color: #4b80ff;
+            color: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            margin: 30px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #4b80ff;
+        }
+        
+        h3 {
+            margin: 20px 0 10px;
+            color: #4b80ff;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        code {
+            font-family: 'Consolas', monospace;
+            background-color: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #333;
+        }
+        
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 3px solid #4b80ff;
+        }
+        
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .toc {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        .toc a {
+            color: #4b80ff;
+            text-decoration: none;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .section {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        
+        table th {
+            background-color: #f0f0f0;
+        }
+        
+        .note {
+            background-color: #e7f3fe;
+            border-left: 4px solid #2196F3;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        
+        .warning {
+            background-color: #fffae7;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .nav a {
+            background-color: #4b80ff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        
+        .nav a:hover {
+            background-color: #3a70ee;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Three.js Game Engine Documentation</h1>
+        <p>A complete reference guide for scripting and engine features</p>
+    </header>
+    
+    <div class="nav">
+        <a href="index.html">Back to Editor</a>
+    </div>
+    
+    <div class="toc">
+        <h3>Table of Contents</h3>
+        <ul>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#scripting">Scripting System</a>
+                <ul>
+                    <li><a href="#script-lifecycle">Script Lifecycle</a></li>
+                    <li><a href="#script-properties">Saving and Loading Properties</a></li>
+                    <li><a href="#coroutines">Coroutines</a></li>
+                </ul>
+            </li>
+            <li><a href="#input-system">Input System</a>
+                <ul>
+                    <li><a href="#keyboard">Keyboard Input</a></li>
+                    <li><a href="#mouse">Mouse Input</a></li>
+                    <li><a href="#touch">Touch Input</a></li>
+                    <li><a href="#gamepad">Gamepad Input</a></li>
+                </ul>
+            </li>
+            <li><a href="#event-system">Event System</a></li>
+            <li><a href="#hierarchy">Scene Hierarchy</a></li>
+            <li><a href="#ecs">Entity-Component System</a></li>
+            <li><a href="#prefabs">Working with Prefabs</a></li>
+            <li><a href="#tags">Tagging System</a></li>
+            <li><a href="#asset-loading">Asset Loading</a></li>
+            <li><a href="#api-reference">API Reference</a></li>
+            <li><a href="#math-utilities">Math Utilities</a></li>
+            <li><a href="#containers">Container Data Structures</a></li>
+            <li><a href="#ai-scripting">AI Scripting</a></li>
+            <li><a href="#behaviors">Behavior Library</a>
+                <ul>
+                    <li><a href="#basic-behaviors">Basic Behaviors</a></li>
+                    <li><a href="#physics-behaviors">Physics & Movement</a></li>
+                    <li><a href="#animation-behaviors">Animation & States</a></li>
+                </ul>
+            </li>
+            <li><a href="#examples">Examples</a>
+                <ul>
+                    <li><a href="#movement">Character Movement</a></li>
+                    <li><a href="#collision">Collision Detection</a></li>
+                    <li><a href="#animation">Animation Control</a></li>
+                    <li><a href="#tweening">Tweening Animations</a></li>
+                    <li><a href="#game-loop">Game Loop & Physics</a></li>
+                    <li><a href="#caching">Cache Manager</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    
+    <div id="getting-started" class="section">
+        <h2>Getting Started</h2>
+        <p>
+            Welcome to the Three.js Game Engine! This documentation will guide you through 
+            creating scripts and working with the engine's features.
+        </p>
+        <p>
+            The engine uses a component-based architecture where scripts can be attached to objects
+            to define their behavior. Scripts have access to the object's transform, the engine
+            itself, and various systems for input, events, physics, and more.
+        </p>
+        <p>
+            To create a script:
+        </p>
+        <ol>
+            <li>Select an object in the scene hierarchy</li>
+            <li>Click the "Script" button in the toolbar</li>
+            <li>Write your script logic</li>
+            <li>Save the script</li>
+            <li>Enter Play mode to see your script in action</li>
+        </ol>
+    </div>
+    
+    <div id="scripting" class="section">
+        <h2>Scripting System</h2>
+        <p>
+            The scripting system allows you to add behavior to objects in your scene. Scripts are 
+            attached to objects and executed while the game is running.
+        </p>
+        
+        <div id="script-lifecycle">
+            <h3>Script Lifecycle</h3>
+            <p>
+                Scripts have several lifecycle methods that are called at specific times:
+            </p>
+            <ul>
+                <li><code>awake()</code> - Called when the script is first initialized</li>
+                <li><code>start()</code> - Called before the first update frame</li>
+                <li><code>update(deltaTime)</code> - Called every frame</li>
+                <li><code>lateUpdate(deltaTime)</code> - Called after all objects' updates have completed</li>
+                <li><code>onEnable()</code> - Called when the script is enabled</li>
+                <li><code>onDisable()</code> - Called when the script is disabled</li>
+            </ul>
+            
+            <pre><code>// Basic script structure
+awake() {
+    // Initialize variables, set up event listeners
+    console.log("Awake called");
+}
+
+start() {
+    // Called right before first update
+    console.log("Start called");
+}
+
+update(deltaTime) {
+    // Called every frame
+    // deltaTime is in seconds
+    this.transform.rotation.y += 1 * deltaTime;
+}
+
+lateUpdate(deltaTime) {
+    // Called after all updates
+    // Good for camera follow or finalization logic
+}
+
+onEnable() {
+    // Called when script becomes active
+}
+
+onDisable() {
+    // Called when script becomes inactive
+    // Clean up resources here
+}</code></pre>
+        </div>
+        
+        <div id="script-properties">
+            <h3>Saving and Loading Properties</h3>
+            <p>
+                Scripts can define serializable properties that persist between sessions and 
+                can be restored during runtime:
+            </p>
+            
+            <pre><code>awake() {
+    // Define default properties
+    this.setProperty('health', 100);
+    this.setProperty('speed', 5);
+}
+
+start() {
+    // Load saved properties
+    this.health = this.getProperty('health', 100);
+    this.speed = this.getProperty('speed', 5);
+    
+    console.log(`Health: ${this.health}, Speed: ${this.speed}`);
+}
+
+takeDamage(amount) {
+    this.health -= amount;
+    // Save the updated value
+    this.setProperty('health', this.health);
+}</code></pre>
+            
+            <p class="note">
+                Properties saved with <code>setProperty()</code> are serialized and will be 
+                saved with the object, making them available between play sessions.
+            </p>
+        </div>
+        
+        <div id="coroutines">
+            <h3>Coroutines</h3>
+            <p>
+                Coroutines allow you to spread functions across multiple frames, making them 
+                great for animations, sequences, and time-delayed actions:
+            </p>
+            
+            <pre><code>start() {
+    // Start a coroutine
+    this.startCoroutine(this.fadeInObject());
+}
+
+// Example coroutine that fades in an object
+*fadeInObject() {
+    this.transform.material.opacity = 0;
+    this.transform.material.transparent = true;
+    
+    for (let a = 0; a <= 1; a += 0.1) {
+        this.transform.material.opacity = a;
+        // Each yield gives control back to the engine until next frame
+        yield;
+    }
+    
+    // After completion
+    this.transform.material.opacity = 1;
+    this.transform.material.transparent = false;
+}
+
+// Coroutine with timing
+*waitAndDoSomething() {
+    console.log("Starting");
+    
+    // Wait for 2 seconds
+    let timer = 0;
+    while (timer < 2) {
+        timer += yield; // deltaTime is passed to yield
+    }
+    
+    console.log("2 seconds passed!");
+    
+    // Do something
+    this.doAction();
+}</code></pre>
+            
+            <p>
+                You can also stop coroutines when needed:
+            </p>
+            
+            <pre><code>start() {
+    this.moveRoutine = this.startCoroutine(this.moveObject());
+}
+
+update(deltaTime) {
+    if (this.isKeyDown('KeyE')) {
+        // Stop the coroutine when E is pressed
+        this.stopCoroutine(this.moveRoutine);
+    }
+}</code></pre>
+        </div>
+    </div>
+    
+    <div id="input-system" class="section">
+        <h2>Input System</h2>
+        <p>
+            The input system provides a unified way to handle keyboard, mouse, touch, and gamepad input.
+            It's accessible from within scripts via <code>this.input</code> or through the helper methods.
+        </p>
+        
+        <div id="keyboard">
+            <h3>Keyboard Input</h3>
+            <p>
+                Keyboard input uses JavaScript KeyboardEvent codes for identifying keys. There are three states:
+            </p>
+            <ul>
+                <li><code>isKeyPressed(keyCode)</code> - True if the key is currently held down</li>
+                <li><code>isKeyDown(keyCode)</code> - True only on the first frame the key is pressed</li>
+                <li><code>isKeyUp(keyCode)</code> - True only on the first frame the key is released</li>
+            </ul>
+            
+            <pre><code>update(deltaTime) {
+    // Continuous movement while key is held
+    if (this.isKeyPressed('KeyW')) {
+        this.transform.position.z -= this.speed * deltaTime;
+    }
+    
+    // Jump only on the first frame Space is pressed
+    if (this.isKeyDown('Space')) {
+        this.jump();
+    }
+    
+    // React to key release
+    if (this.isKeyUp('ShiftLeft')) {
+        this.stopRunning();
+    }
+}</code></pre>
+            
+            <p class="note">
+                Common key codes include 'ArrowLeft', 'ArrowRight', 'KeyA', 'KeyW', 'Space', 'ShiftLeft', etc.
+                The full list is available in the <a href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code/code_values">MDN KeyboardEvent code documentation</a>.
+            </p>
+        </div>
+        
+        <div id="mouse">
+            <h3>Mouse Input</h3>
+            <p>
+                The mouse input system provides position and button states:
+            </p>
+            
+            <pre><code>update(deltaTime) {
+    // Get normalized screen position (-1 to 1)
+    const mousePos = this.getMousePosition();
+    
+    // Get position in 3D world space
+    const worldPos = this.getMouseWorldPosition();
+    
+    // Check buttons: 'left', 'middle', 'right'
+    if (this.isMouseButtonDown('left')) {
+        // Just clicked this frame
+        this.shoot(worldPos);
+    }
+    
+    if (this.isMouseButtonPressed('right')) {
+        // Right button held down
+        this.aim();
+    }
+}</code></pre>
+        </div>
+        
+        <div id="touch">
+            <h3>Touch Input</h3>
+            <p>
+                Touch input is handled through events, allowing you to respond to multi-touch gestures:
+            </p>
+            
+            <pre><code>awake() {
+    // Subscribe to touch events
+    this.on('touchstart', this.onTouchStart);
+    this.on('touchmove', this.onTouchMove);
+    this.on('touchend', this.onTouchEnd);
+}
+
+onTouchStart(data) {
+    // data.touches contains active touches
+    if (data.touches.length === 1) {
+        this.startPosition = data.touches[0].position;
+    }
+}
+
+onTouchMove(data) {
+    if (data.touches.length === 1) {
+        const touch = data.touches[0];
+        // Calculate drag distance
+        const dragX = touch.position.x - this.startPosition.x;
+        this.transform.rotation.y += dragX * 0.1;
+    }
+}
+
+onDisable() {
+    // Clean up event subscriptions
+    this.off('touchstart', this.onTouchStart);
+    this.off('touchmove', this.onTouchMove);
+    this.off('touchend', this.onTouchEnd);
+}</code></pre>
+        </div>
+        
+        <div id="gamepad">
+            <h3>Gamepad Input</h3>
+            <p>
+                The engine supports gamepads for console-style controls:
+            </p>
+            
+            <pre><code>update(deltaTime) {
+    // 0 is the first gamepad
+    // Get analog stick values (-1 to 1)
+    const horizontalAxis = this.input.getGamepadAxisValue(0, 0);
+    const verticalAxis = this.input.getGamepadAxisValue(0, 1);
+    
+    // Move character based on analog stick
+    if (Math.abs(horizontalAxis) > 0.1 || Math.abs(verticalAxis) > 0.1) {
+        this.transform.position.x += horizontalAxis * this.speed * deltaTime;
+        this.transform.position.z -= verticalAxis * this.speed * deltaTime;
+    }
+    
+    // Check buttons (0 is typically A/X button)
+    if (this.input.isGamepadButtonDown(0, 0)) {
+        this.jump();
+    }
+}</code></pre>
+        </div>
+    </div>
+    
+    <div id="event-system" class="section">
+        <h2>Event System</h2>
+        <p>
+            The event system enables communication between objects and systems without direct
+            references. It's great for loose coupling and complex interactions.
+        </p>
+        
+        <pre><code>awake() {
+    // Subscribe to events
+    this.on('game:levelComplete', this.onLevelComplete);
+    this.on('player:health', this.onPlayerHealthChanged);
+    
+    // One-time event listener
+    this.once('game:start', this.onGameStart);
+}
+
+update(deltaTime) {
+    if (this.health <= 0) {
+        // Emit an event for other objects to respond to
+        this.emit('enemy:defeated', {
+            position: this.transform.position.clone(),
+            points: this.pointValue
+        });
+        
+        this.destroySelf();
+    }
+}
+
+onLevelComplete(data) {
+    // React to level completion
+    console.log(`Level completed with score: ${data.score}`);
+}
+
+onDisable() {
+    // Clean up event listeners
+    this.off('game:levelComplete', this.onLevelComplete);
+    this.off('player:health', this.onPlayerHealthChanged);
+}</code></pre>
+        
+        <p class="note">
+            It's good practice to use namespaced event names (e.g., 'game:start', 'player:health')
+            to avoid collisions and make the event system easier to understand.
+        </p>
+    </div>
+    
+    <div id="hierarchy" class="section">
+        <h2>Scene Hierarchy</h2>
+        <p>
+            Objects in the scene are organized in a parent-child hierarchy. Scripts can traverse
+            this hierarchy to find and interact with other objects.
+        </p>
+        
+        <pre><code>awake() {
+    // Find a specific child object
+    this.weapon = this.findChild('Weapon');
+    
+    // Get all children
+    const children = this.getChildren();
+    
+    // Loop through all child objects
+    for (const child of children) {
+        if (child.name.includes('Wheel')) {
+            this.wheels.push(child);
+        }
+    }
+}
+
+// Example of modifying all children
+rotateAllChildren() {
+    const children = this.getChildren();
+    for (const child of children) {
+        child.object3D.rotation.y += 0.1;
+    }
+}</code></pre>
+    </div>
+    
+    <div id="ecs" class="section">
+        <h2>Entity-Component System</h2>
+        <p>
+            The engine includes an Entity-Component System (ECS) which provides a more modular and
+            composable approach to game object behavior compared to traditional monolithic scripts.
+        </p>
+        
+        <p>
+            In the ECS pattern, each game object (Entity) is composed of multiple Components that
+            provide specific functionality. This allows you to mix and match components to create
+            complex behaviors without deep inheritance hierarchies.
+        </p>
+        
+        <h3>Using Components</h3>
+        <pre><code>// Get entity from an object
+const entity = this.engine.ecs.getEntityFromObject(this.object);
+
+// Add components to an entity
+const transform = entity.addComponent(TransformComponent);
+const physics = entity.addComponent(PhysicsComponent);
+const render = entity.addComponent(RenderComponent);
+
+// Configure components
+physics.setVelocity(0, 5, 0);
+physics.setProperty('bounciness', 0.8);
+
+render.setMaterialProperty('color', '#ff0000');
+render.setMaterialProperty('wireframe', true);
+
+// Access components later
+if (entity.hasComponent(PhysicsComponent)) {
+    const physics = entity.getComponent(PhysicsComponent);
+    physics.applyForce(new THREE.Vector3(10, 0, 0)); // Knockback
+}</code></pre>
+
+        <h3>Creating Custom Components</h3>
+        <p>
+            You can create your own components by extending the base Component class:
+        </p>
+        
+        <pre><code>// Import the Component base class
+import { Component } from './ecs.js';
+
+// Create a custom component
+class HealthComponent extends Component {
+    constructor() {
+        super();
+        // Default properties
+        this.setProperty('maxHealth', 100);
+        this.setProperty('currentHealth', 100);
+    }
+    
+    awake() {
+        // Initialize component
+        this.maxHealth = this.getProperty('maxHealth', 100);
+        this.currentHealth = this.getProperty('currentHealth', 100);
+    }
+    
+    takeDamage(amount) {
+        this.currentHealth -= amount;
+        // Update serialized property
+        this.setProperty('currentHealth', this.currentHealth);
+        
+        // Check if dead
+        if (this.currentHealth <= 0) {
+            this.onDeath();
+        }
+    }
+    
+    heal(amount) {
+        this.currentHealth = Math.min(this.maxHealth, this.currentHealth + amount);
+        this.setProperty('currentHealth', this.currentHealth);
+    }
+    
+    onDeath() {
+        console.log(`${this.entity.name} has died!`);
+        // Emit an event
+        this.entity.engine.events.emit('entity:death', { entity: this.entity });
+    }
+}
+
+// Register the component
+this.engine.ecs.registerComponent(HealthComponent);
+
+// Use it on an entity
+const health = entity.addComponent(HealthComponent);
+health.takeDamage(25);</code></pre>
+
+        <h3>Component Lifecycle</h3>
+        <p>
+            Components have the same lifecycle methods as scripts:
+        </p>
+        <ul>
+            <li><code>awake()</code> - Called when the component is first initialized</li>
+            <li><code>start()</code> - Called before the first update</li>
+            <li><code>update(deltaTime)</code> - Called every frame</li>
+            <li><code>lateUpdate(deltaTime)</code> - Called after all updates</li>
+            <li><code>onEnable()</code> - Called when component is enabled</li>
+            <li><code>onDisable()</code> - Called when component is disabled</li>
+            <li><code>onAttach(entity)</code> - Called when the component is added to an entity</li>
+            <li><code>onDetach()</code> - Called when the component is removed from an entity</li>
+        </ul>
+        
+        <h3>Querying Entities</h3>
+        <p>
+            The ECS system makes it easy to query for entities with specific components:
+        </p>
+        
+        <pre><code>// Find all entities with both Health and Physics components
+const entities = this.engine.ecs.queryEntities(HealthComponent, PhysicsComponent);
+
+// Apply damage to all matching entities
+for (const entity of entities) {
+    const health = entity.getComponent(HealthComponent);
+    health.takeDamage(10);
+    
+    const physics = entity.getComponent(PhysicsComponent);
+    physics.applyForce(new THREE.Vector3(0, 5, 0)); // Knockback
+}</code></pre>
+    </div>
+    
+    <div id="prefabs" class="section">
+        <h2>Working with Prefabs</h2>
+        <p>
+            Prefabs are reusable object templates that can be instantiated at runtime.
+            They're perfect for creating multiple instances of the same object type.
+        </p>
+        
+        <pre><code>// Create bullets when shooting
+fireWeapon() {
+    // Instantiate a bullet prefab at the weapon position
+    const bulletPosition = this.transform.position.clone();
+    const bulletRotation = this.transform.rotation.clone();
+    
+    // Create the bullet from a saved prefab
+    const bullet = this.instantiate('BulletPrefab', bulletPosition, bulletRotation);
+    
+    // Access the bullet's script if needed
+    if (bullet && bullet.scriptInstance) {
+        bullet.scriptInstance.speed = this.bulletSpeed;
+        bullet.scriptInstance.damage = this.damage;
+    }
+}
+
+// Example: Spawn enemies on a timer
+*spawnEnemies() {
+    while (this.spawnsRemaining > 0) {
+        // Create random position
+        const position = new THREE.Vector3(
+            Math.random() * 20 - 10,
+            0,
+            Math.random() * 20 - 10
+        );
+        
+        // Instantiate the enemy
+        this.instantiate('EnemyPrefab', position);
+        
+        this.spawnsRemaining--;
+        
+        // Wait 2 seconds before next spawn
+        let timer = 0;
+        while (timer < 2) {
+            timer += yield;
+        }
+    }
+}</code></pre>
+        
+        <p class="note">
+            To create a prefab, select an object in the editor, then click "Save Prefab" 
+            in the toolbar and give it a name. You can then instantiate copies of this 
+            prefab from any script.
+        </p>
+    </div>
+    
+    <div id="tags" class="section">
+        <h2>Tagging System</h2>
+        <p>
+            The tagging system allows you to categorize and find objects based on tags,
+            similar to layers but more flexible.
+        </p>
+        
+        <pre><code>awake() {
+    // Add tags to this object
+    this.addTag('enemy');
+    this.addTag('ranged');
+}
+
+update(deltaTime) {
+    // Find all objects with a specific tag
+    const enemies = this.findObjectsByTag('enemy');
+    
+    // Find nearest enemy
+    let nearest = null;
+    let nearestDistance = Infinity;
+    
+    for (const enemy of enemies) {
+        const distance = this.transform.position.distanceTo(enemy.object3D.position);
+        
+        // Get other object's radius (default to 1 if not set)
+        const otherRadius = enemy.scriptInstance ? 
+            enemy.scriptInstance.getProperty('radius', 1.0) : 1.0;
+        
+        // Check for overlap
+        if (distance < (this.radius + otherRadius)) {
+            // Collision detected!
+            this.onCollision(enemy);
+            
+            // Emit collision event
+            this.emit('collision', {
+                source: this.object,
+                target: enemy,
+                distance: distance
+            });
+            
+            // Push away from collision
+            const pushDirection = new THREE.Vector3();
+            pushDirection.subVectors(this.transform.position, enemy.object3D.position);
+            pushDirection.normalize();
+            
+            // Calculate push force based on overlap
+            const overlap = (this.radius + otherRadius) - distance;
+            pushDirection.multiplyScalar(overlap * 0.5);
+            
+            // Apply push force
+            this.transform.position.add(pushDirection);
+        }
+    }
+}
+
+onCollision(otherObject) {
+    // Implement specific collision response here
+    console.log(`Collided with ${otherObject.name}`);
+}</code></pre>
+        
+        <p>
+            You can combine tags with script queries for more specific filtering:
+        </p>
+        
+        <pre><code>findTargets() {
+    // Get all objects with the 'enemy' tag that have the 'HealthSystem' script
+    const enemies = this.findObjectsByTag('enemy');
+    return enemies.filter(enemy => 
+        enemy.scriptInstance && 
+        enemy.scriptInstance.scriptName === 'HealthSystem'
+    );
+}</code></pre>
+    </div>
+    
+    <div id="api-reference" class="section">
+        <h2>API Reference</h2>
+        <h3>Script Properties</h3>
+        <table>
+            <tr>
+                <th>Property</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>this.object</code></td>
+                <td>Object</td>
+                <td>Reference to the object this script is attached to</td>
+            </tr>
+            <tr>
+                <td><code>this.transform</code></td>
+                <td>THREE.Object3D</td>
+                <td>The Three.js object (position, rotation, scale)</td>
+            </tr>
+            <tr>
+                <td><code>this.engine</code></td>
+                <td>GameEngine</td>
+                <td>Reference to the game engine</td>
+            </tr>
+            <tr>
+                <td><code>this.scene</code></td>
+                <td>THREE.Scene</td>
+                <td>Reference to the Three.js scene</td>
+            </tr>
+            <tr>
+                <td><code>this.input</code></td>
+                <td>InputSystem</td>
+                <td>Reference to the input system</td>
+            </tr>
+            <tr>
+                <td><code>this.events</code></td>
+                <td>EventSystem</td>
+                <td>Reference to the event system</td>
+            </tr>
+            <tr>
+                <td><code>this.scriptName</code></td>
+                <td>String</td>
+                <td>The name of this script</td>
+            </tr>
+            <tr>
+                <td><code>this.renderer</code></td>
+                <td>THREE.WebGLRenderer</td>
+                <td>Reference to the Three.js renderer</td>
+            </tr>
+            <tr>
+                <td><code>this.camera</code></td>
+                <td>THREE.PerspectiveCamera</td>
+                <td>Reference to the main camera</td>
+            </tr>
+            <tr>
+                <td><code>this.assets</code></td>
+                <td>AssetSystem</td>
+                <td>Reference to the asset loading system</td>
+            </tr>
+        </table>
+        
+        <h3>Script Methods</h3>
+        <table>
+            <tr>
+                <th>Method</th>
+                <th>Parameters</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>startCoroutine()</code></td>
+                <td>Generator function</td>
+                <td>Starts a coroutine function</td>
+            </tr>
+            <tr>
+                <td><code>stopCoroutine()</code></td>
+                <td>Coroutine reference</td>
+                <td>Stops a running coroutine</td>
+            </tr>
+            <tr>
+                <td><code>setProperty()</code></td>
+                <td>key, value</td>
+                <td>Saves a property value</td>
+            </tr>
+            <tr>
+                <td><code>getProperty()</code></td>
+                <td>key, defaultValue</td>
+                <td>Gets a property with fallback</td>
+            </tr>
+            <tr>
+                <td><code>on()</code></td>
+                <td>eventName, callback</td>
+                <td>Subscribes to an event</td>
+            </tr>
+            <tr>
+                <td><code>off()</code></td>
+                <td>eventName, callback</td>
+                <td>Unsubscribes from an event</td>
+            </tr>
+            <tr>
+                <td><code>emit()</code></td>
+                <td>eventName, data</td>
+                <td>Emits an event</td>
+            </tr>
+            <tr>
+                <td><code>addTag()</code></td>
+                <td>tag</td>
+                <td>Adds a tag to this object</td>
+            </tr>
+            <tr>
+                <td><code>removeTag()</code></td>
+                <td>tag</td>
+                <td>Removes a tag from this object</td>
+            </tr>
+            <tr>
+                <td><code>hasTag()</code></td>
+                <td>tag</td>
+                <td>Checks if object has a tag</td>
+            </tr>
+            <tr>
+                <td><code>findObjectsByTag()</code></td>
+                <td>tag</td>
+                <td>Finds all objects with a tag</td>
+            </tr>
+            <tr>
+                <td><code>findObjectsByScript()</code></td>
+                <td>scriptName</td>
+                <td>Finds objects with a script</td>
+            </tr>
+            <tr>
+                <td><code>findChild()</code></td>
+                <td>name</td>
+                <td>Finds a child by name</td>
+            </tr>
+            <tr>
+                <td><code>getChildren()</code></td>
+                <td>none</td>
+                <td>Gets all child objects</td>
+            </tr>
+            <tr>
+                <td><code>instantiate()</code></td>
+                <td>prefabName, position, rotation</td>
+                <td>Creates a prefab instance</td>
+            </tr>
+            <tr>
+                <td><code>createMaterial()</code></td>
+                <td>type, properties</td>
+                <td>Creates a new material</td>
+            </tr>
+            <tr>
+                <td><code>createShaderMaterial()</code></td>
+                <td>vertexShader, fragmentShader, uniforms</td>
+                <td>Creates a custom shader material</td>
+            </tr>
+            <tr>
+                <td><code>createObject()</code></td>
+                <td>geometryType, material, position</td>
+                <td>Creates a new 3D object</td>
+            </tr>
+            <tr>
+                <td><code>enable()</code></td>
+                <td>none</td>
+                <td>Enables this script</td>
+            </tr>
+            <tr>
+                <td><code>disable()</code></td>
+                <td>none</td>
+                <td>Disables this script</td>
+            </tr>
+            <tr>
+                <td><code>loadTexture()</code></td>
+                <td>url, options</td>
+                <td>Loads a texture and returns a Promise</td>
+            </tr>
+            <tr>
+                <td><code>loadModel()</code></td>
+                <td>url, type, options</td>
+                <td>Loads a 3D model and returns a Promise</td>
+            </tr>
+            <tr>
+                <td><code>loadAudio()</code></td>
+                <td>url, options</td>
+                <td>Loads an audio file and returns a Promise</td>
+            </tr>
+            <tr>
+                <td><code>getAsset()</code></td>
+                <td>url, type</td>
+                <td>Gets a previously loaded asset</td>
+            </tr>
+            <tr>
+                <td><code>unloadAsset()</code></td>
+                <td>url, type</td>
+                <td>Unloads an asset from memory</td>
+            </tr>
+            <tr>
+                <td><code>createMaterialFromTexture()</code></td>
+                <td>textureUrl, materialType, properties</td>
+                <td>Creates a material with a texture</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div id="math-utilities" class="section">
+        <h2>Math Utilities</h2>
+        <p>
+            The engine provides a comprehensive set of math utilities for common game development needs,
+            accessible through the <code>Math</code> namespace in scripts.
+        </p>
+        
+        <h3>Vector Operations</h3>
+        <pre><code>// Create vectors
+const vec1 = new Math.Vector2(1, 2);
+const vec2 = new Math.Vector3(1, 2, 3);
+
+// Vector operations
+const lengthOfVector = vec2.length();
+const normalizedVector = vec2.normalized();
+const dotProduct = Math.Vector3.dot(vec1, vec2);
+const crossProduct = Math.Vector3.cross(vec1, vec2);
+const distance = Math.Vector3.distance(vec1, vec2);
+
+// Lerp between vectors
+const lerpedVector = Math.Vector3.lerp(vec1, vec2, 0.5); // 50% blend
+
+// Random vectors
+const randomDir = Math.Vector3.random();
+const randomInSphere = Math.Vector3.randomInSphere(5.0); // radius 5</code></pre>
+        
+        <h3>Geometry Helpers</h3>
+        <pre><code>// Check if point is in a sphere
+const isInSphere = Math.Geometry.isPointInSphere(point, center, radius);
+
+// Check if sphere overlaps with another
+const doSpheresOverlap = Math.Geometry.sphereOverlap(center1, radius1, center2, radius2);
+
+// Closest point on line
+const closest = Math.Geometry.closestPointOnLine(point, lineStart, lineEnd);
+
+// Ray casting
+const ray = new Math.Ray(origin, direction);
+const didHit = ray.intersectSphere(sphereCenter, sphereRadius, hitInfo);
+
+// Line intersection
+const intersection = Math.Geometry.lineIntersection(
+    lineAStart, lineAEnd, 
+    lineBStart, lineBEnd
+);</code></pre>
+        
+        <h3>Interpolation & Easing</h3>
+        <pre><code>// Linear interpolation
+const value = Math.lerp(0, 100, 0.5); // Returns 50
+
+// Smooth step (cubic Hermite interpolation)
+const smoothed = Math.smoothStep(0, 1, 0.5); // Smoother than linear
+
+// Easing functions
+const easeIn = Math.Easing.easeInQuad(0.5);
+const easeOut = Math.Easing.easeOutQuad(0.5);
+const easeInOut = Math.Easing.easeInOutQuad(0.5);
+
+// More easing functions: cubic, quart, quint, sine, expo, circ, elastic, back, bounce
+const bounceOut = Math.Easing.bounceOut(0.5);</code></pre>
+        
+        <h3>Random & Noise</h3>
+        <pre><code>// Random number between min and max
+const random = Math.random(1, 10);
+
+// Random integer
+const randomInt = Math.randomInt(1, 10);
+
+// Random from array
+const item = Math.randomFrom(['apple', 'banana', 'orange']);
+
+// Weighted random
+const weighted = Math.weightedRandom([
+    { value: 'common', weight: 70 },
+    { value: 'uncommon', weight: 25 },
+    { value: 'rare', weight: 5 }
+]);
+
+// Perlin noise (1D, 2D, 3D)
+const noise1d = Math.Noise.perlin1D(x);
+const noise2d = Math.Noise.perlin2D(x, y);
+const noise3d = Math.Noise.perlin3D(x, y, z);
+
+// Simplex noise (1D, 2D, 3D)
+const simplex2d = Math.Noise.simplex2D(x, y);</code></pre>
+        
+        <h3>Angles & Rotations</h3>
+        <pre><code>// Convert between degrees and radians
+const radians = Math.toRadians(90);
+const degrees = Math.toDegrees(Math.PI / 2);
+
+// Get angle between vectors
+const angle = Math.angleBetween(vec1, vec2);
+
+// Work with quaternions
+const quat = new Math.Quaternion();
+quat.setFromEuler(0, Math.PI/2, 0); // Set from Euler angles
+quat.setFromAxisAngle(new Math.Vector3(0, 1, 0), Math.PI/2); // Y-axis, 90 degrees
+
+// Smoothly interpolate between rotations
+const slerpedQuat = Math.Quaternion.slerp(quat1, quat2, 0.5);</code></pre>
+    </div>
+    
+    <div id="containers" class="section">
+        <h2>Container Data Structures</h2>
+        <p>
+            The engine provides several container data structures to help organize data in your games,
+            available through the <code>Containers</code> namespace.
+        </p>
+        
+        <h3>Grid</h3>
+        <p>
+            A 2D grid for tile-based games or spatial partitioning.
+        </p>
+        <pre><code>// Create a 10x10 grid
+const grid = new Containers.Grid(10, 10);
+
+// Set values at positions
+grid.set(3, 5, "wall");
+grid.set(4, 5, "door");
+
+// Get values
+const value = grid.get(3, 5); // Returns "wall"
+
+// Check if position is valid
+if (grid.isValidPosition(x, y)) {
+    // Do something with the position
+}
+
+// Get all neighboring cells
+const neighbors = grid.getNeighbors(3, 5);
+
+// Iterate over all cells
+grid.forEach((value, x, y) => {
+    console.log(`Cell at (${x}, ${y}) contains: ${value}`);
+});
+
+// Find cells matching a condition
+const walls = grid.find(value => value === "wall");
+
+// Fill region
+grid.fill(0, 0, 3, 3, "grass");</code></pre>
+        
+        <h3>Pool</h3>
+        <p>
+            Object pooling to reduce garbage collection and improve performance.
+        </p>
+        <pre><code>// Create a pool of bullets
+const bulletPool = new Containers.Pool(() => {
+    // Factory function to create new bullets
+    return this.createObject("sphere", "standard", new THREE.Vector3(0, 0, 0));
+}, 
+(bullet) => {
+    // Reset function called when objects are returned to the pool
+    bullet.position.set(0, 0, 0);
+    bullet.visible = true;
+}, 20); // Pre-allocate 20 bullets
+
+// Get a bullet from the pool
+const bullet = bulletPool.get();
+bullet.position.copy(this.transform.position);
+
+// Return a bullet to the pool when done
+bulletPool.release(bullet);
+
+// Get pool statistics
+const stats = bulletPool.getStats();
+console.log(`Pool size: ${stats.size}, active: ${stats.active}`);</code></pre>
+        
+        <h3>QuadTree</h3>
+        <p>
+            Spatial partitioning structure for efficient collision detection and spatial queries.
+        </p>
+        <pre><code>// Create a quad tree for a 100x100 area with max 4 objects per node
+const quadtree = new Containers.QuadTree(0, 0, 100, 100, 4);
+
+// Insert objects
+quadtree.insert({
+    x: 10, 
+    y: 20, 
+    width: 5, 
+    height: 5, 
+    data: enemyObject
+});
+
+// Query objects in an area
+const results = quadtree.query({
+    x: 5, 
+    y: 15, 
+    width: 20, 
+    height: 20
+});
+
+// Process results
+for (const obj of results) {
+    console.log(`Found object at (${obj.x}, ${obj.y})`);
+    // Check for actual collisions, etc.
+}
+
+// Clear and rebuild the tree (do this each frame if objects are moving)
+quadtree.clear();
+
+// Visualize the quadtree for debugging
+quadtree.visualize(this.scene);</code></pre>
+        
+        <h3>StateMachine</h3>
+        <p>
+            A simple but powerful state machine for managing game states.
+        </p>
+        <pre><code>// Create a state machine
+const fsm = new Containers.StateMachine("idle");
+
+// Add states and their transitions
+fsm.addState("idle", {
+    onEnter: () => console.log("Entering idle state"),
+    onUpdate: (deltaTime) => {
+        // Check for transitions
+        if (this.isKeyPressed("KeyW")) {
+            fsm.transition("walking");
+        }
+    },
+    onExit: () => console.log("Exiting idle state")
+});
+
+fsm.addState("walking", {
+    onEnter: () => {
+        this.walkSpeed = 2.0;
+        this.playAnimation("walk");
+    },
+    onUpdate: (deltaTime) => {
+        // Move character
+        this.transform.translateZ(-this.walkSpeed * deltaTime);
+        
+        // Check for transitions
+        if (!this.isKeyPressed("KeyW")) {
+            fsm.transition("idle");
+        } else if (this.isKeyPressed("ShiftLeft")) {
+            fsm.transition("running");
+        }
+    }
+});
+
+// Add more states...
+
+// Update the state machine in your update method
+update(deltaTime) {
+    fsm.update(deltaTime);
+}</code></pre>
+        
+        <h3>Queue</h3>
+        <p>
+            A first-in-first-out (FIFO) data structure for managing ordered processing.
+        </p>
+        <pre><code>// Create a queue for processing game events
+const eventQueue = new Containers.Queue();
+
+// Add events to the queue
+eventQueue.enqueue({ type: "damage", target: enemy, amount: 10 });
+eventQueue.enqueue({ type: "spawn", position: new THREE.Vector3(0, 0, 10) });
+
+// Process events
+update(deltaTime) {
+    // Process a limited number of events per frame
+    const eventLimit = 5;
+    let count = 0;
+    
+    while (!eventQueue.isEmpty() && count < eventLimit) {
+        const event = eventQueue.dequeue();
+        this.processEvent(event);
+        count++;
+    }
+}
+
+// Check queue status
+if (eventQueue.isEmpty()) {
+    // Queue is empty, all events processed
+    this.startNextWave();
+}
+
+const size = eventQueue.size(); // Get current queue size</code></pre>
+    </div>
+    
+    <div id="ai-scripting" class="section">
+        <h2>AI Scripting</h2>
+        <p>
+            You can leverage AI to help you write scripts for this game engine. Here's a prompt template
+            you can use with AI assistants to generate scripts that work with our engine:
+        </p>
+        
+        <pre><code>I need help writing a script for a Three.js-based game engine with the following features:
+
+1. The script follows a component-based lifecycle with these methods:
+   - awake() - Called when the script is first initialized
+   - start() - Called before the first update frame
+   - update(deltaTime) - Called every frame with time in seconds
+   - lateUpdate(deltaTime) - Called after all updates
+   - onEnable() - Called when script is enabled
+   - onDisable() - Called when script is disabled
+
+2. Available properties and APIs:
+   - this.object - Reference to the game object
+   - this.transform - THREE.Object3D with position, rotation, scale
+   - this.scene - Reference to the THREE.js scene
+   - this.camera - Reference to the main camera
+   
+3. Input handling:
+   - this.isKeyPressed(keyCode) - Check if key is held down
+   - this.isKeyDown(keyCode) - True only on first frame key is pressed
+   - this.isKeyUp(keyCode) - True only on first frame key is released
+   - this.getMousePosition() - Get normalized screen position (-1 to 1)
+   - this.getMouseWorldPosition() - Get mouse position in 3D world
+   - this.isMouseButtonPressed(button) - Check if mouse button is held
+   
+4. Coroutine system using JavaScript generators:
+   - this.startCoroutine(generator) - Start a coroutine
+   - yield - Pause until next frame
+   - while(timer < time) { timer += yield; } - Wait for time
+   
+5. Event system:
+   - this.on(eventName, callback) - Subscribe to event
+   - this.off(eventName, callback) - Unsubscribe
+   - this.emit(eventName, data) - Trigger event
+   
+6. Property serialization:
+   - this.setProperty(key, value) - Save a property
+   - this.getProperty(key, defaultValue) - Load property with fallback
+   
+7. Scene querying and object creation:
+   - this.findObjectsByTag(tag) - Find objects with tag
+   - this.findObjectsByScript(scriptName) - Find objects with script
+   - this.findChild(name) - Find child by name
+   - this.instantiate(prefabName, position, rotation) - Create prefab
+   - this.createObject(geometryType, material, position) - Create primitive
+   
+8. Asset loading:
+   - this.loadTexture(url) - Returns Promise with texture
+   - this.loadModel(url, type) - Returns Promise with 3D model
+   - this.loadAudio(url) - Returns Promise with audio
+   - this.createMaterialFromTexture(url, type, properties) - Create material
+
+Can you help me create a script that [DESCRIBE YOUR SPECIFIC SCRIPT NEED HERE]?</code></pre>
+
+        <p>
+            Replace the last line with your specific scripting requirements. This prompt template includes
+            all the major systems and APIs available in the engine, helping the AI generate code that works
+            correctly with our framework.
+        </p>
+        
+        <p class="note">
+            When using AI-generated scripts, always review them for correctness and adapt them
+            to your specific needs. While AI can provide a good starting point, you may need to
+            modify the code for your particular use case.
+        </p>
+        
+        <h3>Example of a Properly Structured Script</h3>
+        
+        <pre><code>// CubeFollower script - Makes this object follow a cube target
+// Note: Do NOT declare a class or use constructor - use lifecycle methods directly
+
+// Called once when script is initialized
+awake() {
+    console.log("CubeFollower initializing");
+    
+    // Define serializable properties with defaults
+    this.setProperty('followSpeed', 2.0);
+    this.setProperty('hoverHeight', 1.5);
+    this.setProperty('bobAmplitude', 0.2);
+    this.setProperty('bobFrequency', 2.0);
+    this.setProperty('rotationSpeed', 1.0);
+    this.setProperty('maxFollowDistance', 20.0);
+    
+    // Initialize tracking variables
+    this.targetCube = null;
+    this.bobTime = 0;
+    this.isTargetFound = false;
+    
+    // Add tags
+    this.addTag('follower');
+}
+
+// Called right before first update
+start() {
+    console.log("CubeFollower starting");
+    
+    // Load serialized properties
+    this.followSpeed = this.getProperty('followSpeed', 2.0);
+    this.hoverHeight = this.getProperty('hoverHeight', 1.5);
+    this.bobAmplitude = this.getProperty('bobAmplitude', 0.2);
+    this.bobFrequency = this.getProperty('bobFrequency', 2.0);
+    this.rotationSpeed = this.getProperty('rotationSpeed', 1.0);
+    this.maxFollowDistance = this.getProperty('maxFollowDistance', 20.0);
+    
+    // Find the target cube by tag
+    this.findTarget();
+    
+    // Start flying behavior
+    this.startCoroutine(this.flyingSequence());
+    
+    // Register to events
+    this.on("targetLost", this.handleTargetLost);
+    this.on("targetFound", this.handleTargetFound);
+}
+
+// Called every frame
+update(deltaTime) {
+    // Update bobbing time counter
+    this.bobTime += deltaTime * this.bobFrequency;
+    
+    // Apply bobbing motion
+    const bobOffset = Math.sin(this.bobTime) * this.bobAmplitude;
+    this.transform.position.y = this.hoverHeight + bobOffset;
+    
+    // Apply constant rotation
+    this.transform.rotation.y += deltaTime * this.rotationSpeed;
+    this.transform.rotation.x += deltaTime * this.rotationSpeed * 0.3;
+    
+    // If we have a target, follow it
+    if (this.targetCube && this.isTargetFound) {
+        this.followTarget(deltaTime);
+    } else if (!this.targetCube) {
+        // Try to find the target again if we don't have one
+        this.findTarget();
+    }
+}
+
+// Called after all updates
+lateUpdate(deltaTime) {
+    // Check if we're too far from target and trigger events
+    if (this.targetCube) {
+        const distance = this.transform.position.distanceTo(this.targetCube.object3D.position);
+        
+        if (distance > this.maxFollowDistance && this.isTargetFound) {
+            this.isTargetFound = false;
+            this.emit("targetLost", { distance });
+        } else if (distance <= this.maxFollowDistance && !this.isTargetFound) {
+            this.isTargetFound = true;
+            this.emit("targetFound", { distance });
+        }
+    }
+}
+
+// Called when enabled
+onEnable() {
+    console.log("CubeFollower enabled");
+    // Make sure we're visible and active
+    this.transform.visible = true;
+}
+
+// Called when disabled
+onDisable() {
+    console.log("CubeFollower disabled");
+    // Clean up event listeners
+    this.off("targetLost", this.handleTargetLost);
+    this.off("targetFound", this.handleTargetFound);
+}
+
+// Helper method to find a target cube
+findTarget() {
+    // Find objects with 'target' tag
+    const targets = this.findObjectsByTag('target');
+    if (targets.length > 0) {
+        this.targetCube = targets[0];
+        this.isTargetFound = true;
+        console.log("Target found:", this.targetCube.name);
+    } else {
+        // Alternative: find by script name
+        const scriptTargets = this.findObjectsByScript('TargetScript');
+        if (scriptTargets.length > 0) {
+            this.targetCube = scriptTargets[0];
+            this.isTargetFound = true;
+        } else {
+            console.log("No target found, creating default target");
+            this.createDefaultTarget();
+        }
+    }
+}
+
+// Follow the target cube
+followTarget(deltaTime) {
+    if (!this.targetCube) return;
+    
+    // Get target position, maintaining our hover height
+    const targetPos = this.targetCube.object3D.position.clone();
+    targetPos.y = this.hoverHeight;
+    
+    // Get direction to target
+    const direction = new THREE.Vector3().subVectors(
+        targetPos, 
+        this.transform.position
+    ).normalize();
+    
+    // Calculate distance to target
+    const distance = this.transform.position.distanceTo(targetPos);
+    
+    // Move toward target, slowing down as we get closer
+    const speedFactor = Math.min(1.0, distance / 2.0);
+    const moveSpeed = this.followSpeed * speedFactor * deltaTime;
+    
+    // Apply movement if not already very close
+    if (distance > 0.1) {
+        const movement = direction.multiplyScalar(moveSpeed);
+        this.transform.position.add(movement);
+    }
+}
+
+// Create a default target if none is found
+createDefaultTarget() {
+    // Create a cube to follow
+    const material = this.createMaterial('standard', {
+        color: 0x00ff00,
+        metalness: 0.5,
+        roughness: 0.5
+    });
+    
+    const cube = this.createObject('box', material, new THREE.Vector3(5, 0, 5));
+    
+    // Create an engine object reference
+    const targetObj = this.engine.getObjectByThreeJsObject(cube);
+    if (targetObj) {
+        targetObj.name = "DefaultTarget";
+        this.engine.scriptingSystem.addTag(targetObj, 'target');
+        this.targetCube = targetObj;
+        
+        // Make it move in a circle
+        this.startCoroutine(this.moveTargetInCircle(cube));
+    }
+}
+
+// Coroutine for flying sequence
+*flyingSequence() {
+    console.log("Starting flying sequence");
+    
+    // Initial spin
+    let spinDuration = 1.0;
+    let timer = 0;
+    
+    while (timer < spinDuration) {
+        const spinSpeed = 5.0;
+        this.transform.rotation.y += spinSpeed * (yield);
+        timer += yield;
+    }
+    
+    console.log("Fly sequence complete");
+}
+
+// Coroutine to move the target in a circle
+*moveTargetInCircle(targetObject) {
+    let angle = 0;
+    const radius = 5;
+    const speed = 0.5;
+    
+    while (true) {
+        // Each yield returns the deltaTime
+        angle += speed * (yield);
+        
+        // Update position in a circle
+        targetObject.position.x = Math.cos(angle) * radius;
+        targetObject.position.z = Math.sin(angle) * radius;
+    }
+}
+
+// Target lost event handler
+handleTargetLost(data) {
+    console.log(`Target lost at distance ${data.distance}`);
+    // Start search behavior
+    this.startCoroutine(this.searchBehavior());
+}
+
+// Target found event handler
+handleTargetFound(data) {
+    console.log(`Target found at distance ${data.distance}`);
+}
+
+// Search behavior when target is lost
+*searchBehavior() {
+    console.log("Starting search pattern");
+    
+    const startPos = this.transform.position.clone();
+    const searchRadius = 8;
+    let searchAngle = 0;
+    
+    while (!this.isTargetFound) {
+        // Fly in expanding spiral
+        searchAngle += 0.05;
+        const searchScale = Math.min(1.0, searchAngle / 10);
+        
+        const targetX = startPos.x + Math.cos(searchAngle) * searchRadius * searchScale;
+        const targetZ = startPos.z + Math.sin(searchAngle) * searchRadius * searchScale;
+        
+        // Move toward search position
+        const currentPos = this.transform.position;
+        const direction = new THREE.Vector3(
+            targetX - currentPos.x,
+            0,
+            targetZ - currentPos.z
+        ).normalize();
+        
+        // Move faster during search
+        const searchSpeed = this.followSpeed * 1.5 * (yield);
+        this.transform.position.add(direction.multiplyScalar(searchSpeed));
+        
+        // Pause for next frame
+        yield;
+    }
+    
+    console.log("Search complete, target found");
+}
+</code></pre>
+    </div>
+    
+    <div id="behaviors" class="section">
+        <h2>Behavior Library</h2>
+        <p>
+            The engine provides a library of pre-built behavior classes that you can use in your scripts
+            to quickly add common game functionality without writing everything from scratch.
+        </p>
+        <p>
+            Each behavior is a self-contained component that can be added to your script and will update
+            automatically. You can enable, disable, or configure behaviors at runtime.
+        </p>
+        
+        <pre><code>// Example: Using behaviors in your script
+start() {
+    // Add a rotator behavior that spins the object
+    this.rotator = this.addBehavior(this.Behaviors.Rotator, { x: 0, y: 1, z: 0.5 });
+    
+    // Add a physics body for realistic movement
+    this.physics = this.addBehavior(this.Behaviors.PhysicsBody, {
+        mass: 2,
+        useGravity: true,
+        bounciness: 0.7
+    });
+    
+    // Add a waypoint follower with some predefined points
+    const waypoints = [
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(5, 1, 5),
+        new THREE.Vector3(5, 1, -5),
+        new THREE.Vector3(-5, 1, -5)
+    ];
+    
+    this.pathFollower = this.addBehavior(this.Behaviors.WaypointFollower, waypoints, {
+        speed: 2,
+        loop: true
+    });
+}
+
+update(deltaTime) {
+    // Behaviors update automatically, but you can still control them:
+    
+    // Toggle the rotator when spacebar is pressed
+    if (this.isKeyDown('Space')) {
+        if (this.rotator.enabled) {
+            this.rotator.disable();
+        } else {
+            this.rotator.enable();
+        }
+    }
+    
+    // Apply an upward force when 'W' is pressed
+    if (this.isKeyPressed('KeyW')) {
+        this.physics.applyForce(new THREE.Vector3(0, 10, 0));
+    }
+}</code></pre>
+        
+        <div id="basic-behaviors">
+            <h3>Basic Behaviors</h3>
+            
+            <h4>Rotator</h4>
+            <p>
+                Continuously rotates an object around one or more axes at specified speeds.
+            </p>
+            <pre><code>// Add a rotator with specific speeds for each axis
+const rotator = this.addBehavior(this.Behaviors.Rotator, { x: 0, y: 1, z: 0.5 });
+
+// Change rotation speed later
+rotator.setSpeed('y', 2.0);</code></pre>
+            
+            <h4>Oscillator</h4>
+            <p>
+                Makes an object move back and forth along an axis using a sine wave.
+            </p>
+            <pre><code>// Parameters: axis, amplitude, frequency
+const oscillator = this.addBehavior(this.Behaviors.Oscillator, 'y', 1.5, 2.0);
+
+// Reset the center position if the object moves
+oscillator.resetStartPosition();</code></pre>
+            
+            <h4>Follower</h4>
+            <p>
+                Makes an object follow a target at a specified speed.
+            </p>
+            <pre><code>// Find a target to follow
+const target = this.findObjectsByTag('player')[0];
+
+// Parameters: target, speed, minimum distance
+const follower = this.addBehavior(this.Behaviors.Follower, target, 3.0, 0.5);
+
+// Change target later
+follower.setTarget(newTarget);</code></pre>
+            
+            <h4>LookAt</h4>
+            <p>
+                Makes an object continuously face a target, with optional smoothing.
+            </p>
+            <pre><code>// Parameters: target, smooth rotation, smoothing factor
+const lookAt = this.addBehavior(this.Behaviors.LookAt, target, true, 5.0);</code></pre>
+            
+            <h4>Orbit</h4>
+            <p>
+                Makes an object orbit around a target at a specified distance and speed.
+            </p>
+            <pre><code>// Parameters: target, speed, radius, height offset
+const orbit = this.addBehavior(this.Behaviors.Orbit, target, 0.5, 5, 2);</code></pre>
+            
+            <h4>Timer</h4>
+            <p>
+                Executes a callback after a specified duration, optionally repeating.
+            </p>
+            <pre><code>// Parameters: duration, callback, repeat
+const timer = this.addBehavior(this.Behaviors.Timer, 3.0, () => {
+    console.log("Timer complete!");
+    this.spawnEffect();
+}, true);
+
+// Reset the timer manually
+timer.reset();</code></pre>
+        </div>
+        
+        <div id="physics-behaviors">
+            <h3>Physics & Movement Behaviors</h3>
+            
+            <h4>PhysicsBody</h4>
+            <p>
+                Adds physical properties like mass, gravity, velocity, and collision response.
+            </p>
+            <pre><code>// Add physics with options
+const physics = this.addBehavior(this.Behaviors.PhysicsBody, {
+    mass: 2.0,
+    useGravity: true,
+    gravity: -9.8,
+    drag: 0.1,
+    bounciness: 0.7
+});
+
+// Apply a force (affects acceleration)
+physics.applyForce(new THREE.Vector3(10, 0, 0));
+
+// Apply an impulse (immediate velocity change)
+physics.applyImpulse(new THREE.Vector3(0, 5, 0));
+
+// Set velocity directly
+physics.setVelocity(0, 5, -2);</code></pre>
+            
+            <h4>InputController</h4>
+            <p>
+                Handles keyboard input for standard character movement with optional physics.
+            </p>
+            <pre><code>// Create with customized options
+const input = this.addBehavior(this.Behaviors.InputController, {
+    moveSpeed: 5,
+    jumpForce: 10,
+    addPhysicsBody: true,
+    // Custom key bindings
+    moveForward: 'ArrowUp',
+    moveBackward: 'ArrowDown',
+    moveLeft: 'ArrowLeft',
+    moveRight: 'ArrowRight',
+    jump: 'Space',
+    sprint: 'ShiftLeft'
+});</code></pre>
+            
+            <h4>CameraController</h4>
+            <p>
+                Controls camera movement with several modes: follow, look-at, first-person, or orbit.
+            </p>
+            <pre><code>// Find the target to follow
+const target = this.findObjectsByTag('player')[0];
+
+// Create camera controller with options
+const camera = this.addBehavior(this.Behaviors.CameraController, target, {
+    type: 'follow',  // 'follow', 'lookAt', 'firstPerson', 'orbit'
+    offset: new THREE.Vector3(0, 5, 10),  // Camera position relative to target
+    lookOffset: new THREE.Vector3(0, 1, 0),  // Look at this offset from target
+    smoothing: 5.0,  // Position smoothing factor
+    rotationSmoothing: 3.0  // Rotation smoothing factor
+});
+
+// Change camera type later
+camera.setCameraType('orbit');</code></pre>
+            
+            <h4>WaypointFollower</h4>
+            <p>
+                Makes an object follow a path defined by waypoints.
+            </p>
+            <pre><code>// Define waypoints as Vector3 positions
+const waypoints = [
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(10, 0, 0),
+    new THREE.Vector3(10, 0, 10),
+    new THREE.Vector3(0, 0, 10)
+];
+
+// Create follower with options
+const path = this.addBehavior(this.Behaviors.WaypointFollower, waypoints, {
+    speed: 2.0,
+    waypointRadius: 0.5,  // How close to get to each point
+    loop: true  // Whether to loop back to start
+});
+
+// Add another waypoint dynamically
+path.addWaypoint(new THREE.Vector3(-5, 0, 5));
+
+// Clear all waypoints
+path.clearWaypoints();</code></pre>
+        </div>
+        
+        <div id="animation-behaviors">
+            <h3>Animation & State Behaviors</h3>
+            
+            <h4>AnimationController</h4>
+            <p>
+                Manages and blends animations for a model with an animation mixer.
+            </p>
+            <pre><code>// Create animation controller with options
+const anim = this.addBehavior(this.Behaviors.AnimationController, {
+    crossFadeDuration: 0.3  // Duration of crossfade between animations
+});
+
+// Play an animation with options
+anim.play('Walk', {
+    loop: true,
+    clampWhenFinished: false,
+    timeScale: 1.2,
+    crossFadeDuration: 0.5  // Override default crossfade
+});
+
+// Stop an animation
+anim.stop('Walk');
+
+// Stop all animations
+anim.stop();
+
+// Change playback speed for all animations
+anim.setTimeScale(0.5);</code></pre>
+            
+            <h4>StateMachine</h4>
+            <p>
+                Manages state transitions with callbacks for enter, update, and exit events.
+            </p>
+            <pre><code>// Create a state machine
+const stateMachine = this.addBehavior(this.Behaviors.StateMachine);
+
+// Add states with callbacks
+stateMachine.addState('idle', {
+    onEnter: () => {
+        console.log('Entering idle state');
+        this.animController.play('Idle');
+    },
+    onUpdate: (deltaTime) => {
+        // Check for state transition conditions
+        if (this.isKeyPressed('KeyW')) {
+            stateMachine.transition('walking');
+        }
+    },
+    onExit: () => {
+        console.log('Exiting idle state');
+    }
+});
+
+// Add more states
+stateMachine.addState('walking', {
+    onEnter: () => {
+        this.animController.play('Walk');
+        this.speed = 2.0;
+    },
+    onUpdate: (deltaTime) => {
+        if (!this.isKeyPressed('KeyW')) {
+            stateMachine.transition('idle');
+        }
+        if (this.isKeyPressed('ShiftLeft')) {
+            stateMachine.transition('running');
+        }
+    }
+});
+
+// Check current state
+if (stateMachine.isInState('walking')) {
+    // Do something specific to walking state
+}
+
+// Get state information
+const currentState = stateMachine.getCurrentState();
+const previousState = stateMachine.getPreviousState();</code></pre>
+        </div>
+    </div>
+    
+    <div id="examples" class="section">
+        <h2>Examples</h2>
+        
+        <div id="movement">
+            <h3>Character Movement</h3>
+            <pre><code>// Character Controller Script
+
+awake() {
+    this.setProperty('moveSpeed', 5);
+    this.setProperty('rotationSpeed', 3);
+    this.setProperty('jumpForce', 7);
+    this.setProperty('gravity', 20);
+    
+    this.addTag('player');
+    
+    // Initialize state variables
+    this.velocity = new THREE.Vector3();
+    this.isGrounded = true;
+}
+
+start() {
+    // Load saved properties
+    this.moveSpeed = this.getProperty('moveSpeed', 5);
+    this.rotationSpeed = this.getProperty('rotationSpeed', 3);
+    this.jumpForce = this.getProperty('jumpForce', 7);
+    this.gravity = this.getProperty('gravity', 20);
+    
+    // Set initial position
+    this.startPos = this.transform.position.clone();
+}
+
+update(deltaTime) {
+    // Handle movement input
+    let moveX = 0;
+    let moveZ = 0;
+    
+    if (this.isKeyPressed('KeyW')) moveZ -= 1;
+    if (this.isKeyPressed('KeyS')) moveZ += 1;
+    if (this.isKeyPressed('KeyA')) moveX -= 1;
+    if (this.isKeyPressed('KeyD')) moveX += 1;
+    
+    // Calculate movement vector
+    const moveVector = new THREE.Vector3(moveX, 0, moveZ);
+    moveVector.normalize().multiplyScalar(this.moveSpeed * deltaTime);
+    
+    // Apply movement in local space
+    this.transform.translateX(moveVector.x);
+    this.transform.translateZ(moveVector.z);
+    
+    // Handle rotation with mouse
+    if (this.isMouseButtonPressed('left')) {
+        const mousePos = this.getMousePosition();
+        const rotationAmount = mousePos.x * this.rotationSpeed * deltaTime;
+        this.transform.rotation.y -= rotationAmount;
+    }
+    
+    // Jumping
+    if (this.isKeyDown('Space') && this.isGrounded) {
+        this.velocity.y = this.jumpForce;
+        this.isGrounded = false;
+    }
+    
+    // Apply gravity
+    if (!this.isGrounded) {
+        this.velocity.y -= this.gravity * deltaTime;
+    }
+    
+    // Apply vertical movement
+    this.transform.position.y += this.velocity.y * deltaTime;
+    
+    // Simple ground check
+    if (this.transform.position.y <= 0) {
+        this.transform.position.y = 0;
+        this.velocity.y = 0;
+        this.isGrounded = true;
+    }
+    
+    // Reset position if fallen off the world
+    if (this.transform.position.y < -10) {
+        this.transform.position.copy(this.startPos);
+        this.velocity.set(0, 0, 0);
+    }
+}</code></pre>
+        </div>
+        
+        <div id="collision">
+            <h3>Collision Detection</h3>
+            <pre><code>// Simple Collision Script
+
+awake() {
+    this.setProperty('radius', 1.0);
+    this.addTag('collidable');
+    this.objects = [];
+}
+
+start() {
+    // Get collision radius
+    this.radius = this.getProperty('radius', 1.0);
+    
+    // Find all objects with the 'collidable' tag
+    this.objects = this.findObjectsByTag('collidable');
+    
+    // Remove self from the list
+    this.objects = this.objects.filter(obj => obj !== this.object);
+}
+
+update(deltaTime) {
+    // Check for collisions with all collidable objects
+    for (const obj of this.objects) {
+        // Skip if no transform
+        if (!obj.object3D) continue;
+        
+        // Calculate distance between centers
+        const distance = this.transform.position.distanceTo(obj.object3D.position);
+        
+        // Get other object's radius (default to 1 if not set)
+        const otherRadius = obj.scriptInstance ? 
+            obj.scriptInstance.getProperty('radius', 1.0) : 1.0;
+        
+        // Check for overlap
+        if (distance < (this.radius + otherRadius)) {
+            // Collision detected!
+            this.onCollision(obj);
+            
+            // Emit collision event
+            this.emit('collision', {
+                source: this.object,
+                target: obj,
+                distance: distance
+            });
+            
+            // Push away from collision
+            const pushDirection = new THREE.Vector3();
+            pushDirection.subVectors(this.transform.position, obj.object3D.position);
+            pushDirection.normalize();
+            
+            // Calculate push force based on overlap
+            const overlap = (this.radius + otherRadius) - distance;
+            pushDirection.multiplyScalar(overlap * 0.5);
+            
+            // Apply push force
+            this.transform.position.add(pushDirection);
+        }
+    }
+}
+
+onCollision(otherObject) {
+    // Implement specific collision response here
+    console.log(`Collided with ${otherObject.name}`);
+}</code></pre>
+        </div>
+        
+        <div id="animation">
+            <h3>Animation Control</h3>
+            <pre><code>// Animation Controller Script
+
+awake() {
+    // Animation properties
+    this.setProperty('animations', ['idle', 'walk', 'run', 'jump']);
+    this.setProperty('currentAnimation', 'idle');
+    this.setProperty('transitionSpeed', 0.2);
+    
+    // State tracking
+    this.isMoving = false;
+    this.isRunning = false;
+    this.isJumping = false;
+}
+
+start() {
+    this.animations = this.getProperty('animations', ['idle']);
+    this.currentAnimation = this.getProperty('currentAnimation', 'idle');
+    this.transitionSpeed = this.getProperty('transitionSpeed', 0.2);
+    
+    // Set up animation mixer
+    this.setupMixer();
+}
+
+setupMixer() {
+    // Create THREE.js AnimationMixer
+    // Note: This assumes a THREE model with animations is attached
+    const model = this.findChild('Model');
+    
+    if (!model || !model.object3D) {
+        console.error("No model found!");
+        return;
+    }
+    
+    // Create animation mixer
+    this.mixer = new THREE.AnimationMixer(model.object3D);
+    
+    // Find animations
+    if (model.object3D.animations) {
+        // Create animation actions
+        this.actions = {};
+        model.object3D.animations.forEach(clip => {
+            const action = this.mixer.clipAction(clip);
+            this.actions[clip.name] = action;
+        });
+        
+        // Set default settings
+        action.clampWhenFinished = true;
+        action.setLoop(THREE.LoopRepeat);
+    }
+    
+    // Start default animation
+    if (this.actions[this.currentAnimation]) {
+        this.actions[this.currentAnimation].play();
+    }
+}
+
+update(deltaTime) {
+    // Update animation mixer
+    if (this.mixer) {
+        this.mixer.update(deltaTime);
+    }
+    
+    // Determine animation state based on movement
+    const isMovingNow = 
+        this.isKeyPressed('KeyW') || 
+        this.isKeyPressed('KeyA') || 
+        this.isKeyPressed('KeyS') || 
+        this.isKeyPressed('KeyD');
+        
+    const isRunningNow = isMovingNow && this.isKeyPressed('ShiftLeft');
+    const isJumpingNow = !this.isGrounded;
+    
+    // State transitions
+    if (isJumpingNow && !this.isJumping) {
+        this.changeAnimation('jump');
+    } else if (isRunningNow && !this.isRunning) {
+        this.changeAnimation('run');
+    } else if (isMovingNow && !this.isMoving && !isJumpingNow) {
+        this.changeAnimation('walk');
+    } else if (!isMovingNow && this.isMoving && !isJumpingNow) {
+        this.changeAnimation('idle');
+    }
+    
+    // Update state trackers
+    this.isMoving = isMovingNow;
+    this.isRunning = isRunningNow;
+    this.isJumping = isJumpingNow;
+}
+
+changeAnimation(name) {
+    if (!this.actions || !this.actions[name]) return;
+    
+    // Save current animation name
+    this.currentAnimation = name;
+    this.setProperty('currentAnimation', name);
+    
+    // Crossfade to new animation
+    const from = this.actions[this.currentAnimation];
+    const to = this.actions[name];
+    
+    if (from && to) {
+        from.fadeOut(this.transitionSpeed);
+        to.reset().fadeIn(this.transitionSpeed).play();
+    } else {
+        // No previous animation, just play
+        to.reset().play();
+    }
+}</code></pre>
+        </div>
+        
+        <div id="tweening">
+            <h3>Tweening Animations</h3>
+            <pre><code>// Tween Animation Example
+
+awake() {
+    this.setProperty('floatHeight', 2);
+    this.setProperty('floatDuration', 2);
+    this.setProperty('rotationSpeed', 1);
+}
+
+start() {
+    // Load properties
+    this.floatHeight = this.getProperty('floatHeight', 2);
+    this.floatDuration = this.getProperty('floatDuration', 2);
+    this.rotationSpeed = this.getProperty('rotationSpeed', 1);
+    
+    // Store initial position
+    this.startY = this.transform.position.y;
+    
+    // Start the floating animation
+    this.startFloatingAnimation();
+}
+
+update(deltaTime) {
+    // Rotate the object
+    this.transform.rotation.y += this.rotationSpeed * deltaTime;
+}
+
+startFloatingAnimation() {
+    // Create a tween to float the object up
+    const upTween = this.tween(
+        this.transform.position, // Target object
+        { y: this.startY + this.floatHeight }, // End properties
+        this.floatDuration, // Duration in seconds
+        'easeInOut', // Easing function
+        () => {
+            // When up movement completes, start down movement
+            this.startFloatingDownAnimation();
+        }
+    );
+}
+
+startFloatingDownAnimation() {
+    // Create a tween to float the object down
+    const downTween = this.tween(
+        this.transform.position,
+        { y: this.startY },
+        this.floatDuration,
+        'easeInOut',
+        () => {
+            // When down movement completes, start up movement again
+            this.startFloatingAnimation();
+        }
+    );
+}
+
+// Color flash when hit
+flashColor() {
+    const material = this.transform.material;
+    if (!material) return;
+    
+    // Store original color
+    const originalColor = material.color.clone();
+    
+    // Flash to red
+    material.color.set(0xff0000);
+    
+    // Tween back to original color
+    this.tween(
+        material.color,
+        { 
+            r: originalColor.r,
+            g: originalColor.g,
+            b: originalColor.b
+        },
+        0.5,
+        'easeOut'
+    );
+}</code></pre>
+        </div>
+        
+        <div id="game-loop">
+            <h3>Game Loop & Physics</h3>
+            <pre><code>// Game Loop Example
+
+awake() {
+    this.setProperty('gravity', 9.8);
+    this.setProperty('velocity', { x: 0, y: 0, z: 0 });
+    this.setProperty('isGrounded', true);
+    
+    this.groundY = 0;
+    this.velocity = new THREE.Vector3(
+        this.getProperty('velocity').x || 0,
+        this.getProperty('velocity').y || 0,
+        this.getProperty('velocity').z || 0
+    );
+}
+
+start() {
+    // Register for fixed update (physics simulation)
+    this.addFixedUpdateCallback(this.fixedUpdate);
+    
+    // Load properties
+    this.gravity = this.getProperty('gravity', 9.8);
+    this.isGrounded = this.getProperty('isGrounded', true);
+}
+
+update(deltaTime) {
+    // Handle input in the standard update
+    if (this.isKeyPressed('KeyA')) {
+        this.velocity.x = -5;
+    } else if (this.isKeyPressed('KeyD')) {
+        this.velocity.x = 5;
+    } else {
+        // Apply drag
+        this.velocity.x *= 0.9;
+    }
+    
+    // Jump only when grounded
+    if (this.isKeyDown('Space') && this.isGrounded) {
+        this.velocity.y = 10;
+        this.isGrounded = false;
+        this.setProperty('isGrounded', false);
+    }
+}
+
+// Physics in fixed time step for consistent simulation
+fixedUpdate(fixedDeltaTime) {
+    // Apply gravity
+    if (!this.isGrounded) {
+        this.velocity.y -= this.gravity * fixedDeltaTime;
+    }
+    
+    // Apply velocity to position
+    this.transform.position.x += this.velocity.x * fixedDeltaTime;
+    this.transform.position.y += this.velocity.y * fixedDeltaTime;
+    this.transform.position.z += this.velocity.z * fixedDeltaTime;
+    
+    // Check for ground collision
+    if (this.transform.position.y <= this.groundY) {
+        this.transform.position.y = this.groundY;
+        this.velocity.y = 0;
+        this.isGrounded = true;
+        this.setProperty('isGrounded', true);
+    }
+    
+    // Update serialized velocity
+    this.setProperty('velocity', {
+        x: this.velocity.x,
+        y: this.velocity.y,
+        z: this.velocity.z
+    });
+}
+
+// Clean up when script is disabled
+onDisable() {
+    // Remove the fixed update callback
+    this.removeFixedUpdateCallback(this.fixedUpdate);
+}</code></pre>
+        </div>
+        
+        <div id="caching">
+            <h3>Cache Manager</h3>
+            <pre><code>// Cache Manager Example
+
+awake() {
+    // Initialize arrays to store generated objects
+    this.objects = [];
+    this.cacheKey = 'level-data-' + this.object.id;
+}
+
+start() {
+    // Try to load level data from cache
+    const cachedData = this.cache.get(this.cacheKey);
+    
+    if (cachedData) {
+        console.log('Loaded level data from cache');
+        this.loadFromCachedData(cachedData);
+    } else {
+        console.log('Generating new level data');
+        // Generate new level data (expensive operation)
+        const levelData = this.generateLevelData();
+        
+        // Store in cache for 5 minutes
+        this.cache.set(this.cacheKey, levelData, 300);
+        
+        // Use the generated data
+        this.loadFromCachedData(levelData);
+    }
+}
+
+generateLevelData() {
+    // Simulate an expensive operation
+    console.log('Performing expensive level generation...');
+    
+    const levelData = {
+        tiles: [],
+        entities: [],
+        properties: {
+            theme: ['forest', 'desert', 'ice'][Math.floor(Math.random() * 3)],
+            difficulty: Math.random() * 10
+        }
+    };
+    
+    // Generate 100 tiles
+    for (let i = 0; i < 100; i++) {
+        levelData.tiles.push({
+            x: Math.floor(i / 10),
+            y: i % 10,
+            type: Math.floor(Math.random() * 5)
+        });
+    }
+    
+    // Generate 10 entities
+    for (let i = 0; i < 10; i++) {
+        levelData.entities.push({
+            type: ['enemy', 'pickup', 'obstacle'][Math.floor(Math.random() * 3)],
+            x: Math.random() * 10,
+            y: Math.random() * 10,
+            properties: {
+                health: Math.floor(Math.random() * 100),
+                value: Math.floor(Math.random() * 50)
+            }
+        });
+    }
+    
+    return levelData;
+}
+
+loadFromCachedData(data) {
+    // Create visual elements based on the data
+    console.log(`Creating level with theme: ${data.properties.theme}`);
+    console.log(`Difficulty: ${data.properties.difficulty.toFixed(1)}`);
+    
+    // Clear any existing objects
+    for (const obj of this.objects) {
+        this.scene.remove(obj);
+    }
+    this.objects = [];
+    
+    // Create tiles
+    for (const tile of data.tiles) {
+        const cube = this.createObject('box', 'standard',
+            new THREE.Vector3(tile.x, 0, tile.y)
+        );
+        cube.scale.set(0.9, 0.2, 0.9);
+        
+        // Set material based on tile type
+        if (cube.material) {
+            const colors = [0x1a9641, 0xa6d96a, 0xffffbf, 0xfdae61, 0xd7191c];
+            cube.material.color.setHex(colors[tile.type % colors.length]);
+        }
+        
+        this.objects.push(cube);
+    }
+    
+    // Create entities
+    for (const entity of data.entities) {
+        let obj;
+        
+        if (entity.type === 'enemy') {
+            obj = this.createObject('sphere', 'standard',
+                new THREE.Vector3(entity.x, 0.5, entity.y)
+            );
+            obj.scale.set(0.4, 0.4, 0.4);
+            if (obj.material) obj.material.color.setHex(0xff0000);
+        } else if (entity.type === 'pickup') {
+            obj = this.createObject('box', 'standard',
+                new THREE.Vector3(entity.x, 0.5, entity.y)
+            );
+            obj.scale.set(0.3, 0.3, 0.3);
+            obj.rotation.set(Math.PI/4, Math.PI/4, 0);
+            if (obj.material) obj.material.color.setHex(0xffff00);
+        } else {
+            obj = this.createObject('cylinder', 'standard',
+                new THREE.Vector3(entity.x, 0.5, entity.y)
+            );
+            obj.scale.set(0.3, 0.8, 0.3);
+            if (obj.material) obj.material.color.setHex(0x808080);
+        }
+        
+        this.objects.push(obj);
+    }
+}
+
+// Cache the player's progress
+saveProgress(playerData) {
+    // Store player progress in cache (persists between scenes)
+    this.cache.set('player-progress', playerData, 3600); // 1 hour expiry
+    console.log('Player progress saved to cache');
+}
+
+// Load the player's progress
+loadProgress() {
+    const progress = this.cache.get('player-progress');
+    if (progress) {
+        console.log('Player progress loaded from cache');
+        return progress;
+    }
+    return null;
+}</code></pre>
+        </div>
+        
+    </div>
+    
+    <footer>
+        <p>Three.js Game Engine Documentation - Copyright &copy; 2023</p>
+    </footer>
+</body>
+</html>
