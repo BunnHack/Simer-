@@ -250,14 +250,64 @@ class CacheManager {
     }
 }
 
+// Add Timer class for scheduling callbacks
+class Timer {
+    constructor(callback, delay, repeat = false) {
+        this.callback = callback;
+        this.delay = delay;
+        this.repeat = repeat;
+        this.elapsed = 0;
+        this.isActive = true;
+        this.isCompleted = false;
+    }
+    
+    update(deltaTime) {
+        if (!this.isActive || this.isCompleted) return;
+        
+        this.elapsed += deltaTime;
+        
+        if (this.elapsed >= this.delay) {
+            this.callback();
+            
+            if (this.repeat) {
+                this.elapsed = 0;
+            } else {
+                this.isCompleted = true;
+            }
+        }
+    }
+    
+    reset() {
+        this.elapsed = 0;
+        this.isCompleted = false;
+    }
+    
+    stop() {
+        this.isActive = false;
+    }
+    
+    resume() {
+        this.isActive = true;
+    }
+}
+
+/**
+ * ScriptingSystem manages runtime scripts and behaviors for game objects
+ * Handles script creation, initialization, execution, and cleanup
+ */
 export class ScriptingSystem {
+    /**
+     * Creates a new ScriptingSystem instance
+     * @param {GameEngine} engine - Reference to the main game engine
+     */
     constructor(engine) {
         this.engine = engine;
         this.scriptInstances = new Map();
         
-        // Tag system for component queries
+        // Tag system for component queries with weak references to avoid memory leaks
         this.objectsByTag = new Map();
         this.objectsByScript = new Map();
+        this.weakRefs = new WeakMap(); // Store weak references to objects
         
         // Add game loop manager
         this.gameLoop = new GameLoop();
@@ -267,29 +317,39 @@ export class ScriptingSystem {
         
         // Add tweens management
         this.tweens = [];
+        
+        // Add timers management
+        this.timers = [];
+        
+        // Track deleted objects to clean up references
+        this._pendingCleanup = new Set();
     }
     
     /**
-     * Get all objects with a specific tag
+     * Gets all objects with a specified tag
      * @param {string} tag - The tag to search for
-     * @returns {Array} - Array of objects with the tag
+     * @returns {Array} - Array of objects with the specified tag
      */
     getObjectsByTag(tag) {
+        // Clean up any pending objects first
+        this._cleanupDeletedObjects();
         return this.objectsByTag.get(tag) || [];
     }
     
     /**
-     * Get all objects with a specific script
+     * Gets all objects with a specified script
      * @param {string} scriptName - The script name to search for
-     * @returns {Array} - Array of objects with the script
+     * @returns {Array} - Array of objects with the specified script
      */
     getObjectsByScript(scriptName) {
+        // Clean up any pending objects first
+        this._cleanupDeletedObjects();
         return this.objectsByScript.get(scriptName) || [];
     }
     
     /**
-     * Add tag to an object
-     * @param {object} obj - The object to tag
+     * Adds a tag to an object
+     * @param {Object} obj - The object to tag
      * @param {string} tag - The tag to add
      */
     addTag(obj, tag) {
@@ -307,14 +367,14 @@ export class ScriptingSystem {
         const taggedObjects = this.objectsByTag.get(tag);
         if (!taggedObjects.includes(obj)) {
             taggedObjects.push(obj);
+            
+            // Store a weak reference to track object deletion
+            if (!this.weakRefs.has(obj)) {
+                this.weakRefs.set(obj, new WeakRef(obj));
+            }
         }
     }
     
-    /**
-     * Remove tag from an object
-     * @param {object} obj - The object to remove tag from
-     * @param {string} tag - The tag to remove
-     */
     removeTag(obj, tag) {
         if (!obj.tags || !obj.tags.has(tag)) return;
         
@@ -334,24 +394,136 @@ export class ScriptingSystem {
         }
     }
     
-    /**
-     * Check if object has a specific tag
-     * @param {object} obj - The object to check
-     * @param {string} tag - The tag to check for
-     * @returns {boolean} - True if object has the tag
-     */
-    hasTag(obj, tag) {
-        return obj.tags && obj.tags.has(tag);
+    markForCleanup(obj) {
+        if (obj) {
+            this._pendingCleanup.add(obj.id);
+        }
     }
     
-    // Create a tween animation
+    _cleanupDeletedObjects() {
+        // Process pending explicit cleanups
+        if (this._pendingCleanup.size > 0) {
+            for (const objId of this._pendingCleanup) {
+                this._removeObjectReferences(objId);
+            }
+            this._pendingCleanup.clear();
+        }
+        
+        // Additionally check weak references
+        // Iterate all tag collections
+        for (const [tag, objects] of this.objectsByTag.entries()) {
+            const validObjects = [];
+            for (let i = 0; i < objects.length; i++) {
+                const obj = objects[i];
+                // Check if the weak reference is still valid
+                if (this.weakRefs.has(obj) && this.weakRefs.get(obj).deref()) {
+                    validObjects.push(obj);
+                }
+            }
+            
+            // Update the collection or remove it if empty
+            if (validObjects.length === 0) {
+                this.objectsByTag.delete(tag);
+            } else if (validObjects.length !== objects.length) {
+                this.objectsByTag.set(tag, validObjects);
+            }
+        }
+        
+        // Do the same for script collections
+        for (const [script, objects] of this.objectsByScript.entries()) {
+            const validObjects = [];
+            for (let i = 0; i < objects.length; i++) {
+                const obj = objects[i];
+                if (this.weakRefs.has(obj) && this.weakRefs.get(obj).deref()) {
+                    validObjects.push(obj);
+                }
+            }
+            
+            if (validObjects.length === 0) {
+                this.objectsByScript.delete(script);
+            } else if (validObjects.length !== objects.length) {
+                this.objectsByScript.set(script, validObjects);
+            }
+        }
+    }
+    
+    _removeObjectReferences(objId) {
+        // Find the object by ID
+        const obj = this.engine.getObjectById(objId);
+        
+        // If object is gone, remove all references by scanning
+        this.objectsByTag.forEach((objects, tag) => {
+            const updated = objects.filter(o => o.id !== objId);
+            if (updated.length === 0) {
+                this.objectsByTag.delete(tag);
+            } else if (updated.length !== objects.length) {
+                this.objectsByTag.set(tag, updated);
+            }
+        });
+        
+        this.objectsByScript.forEach((objects, script) => {
+            const updated = objects.filter(o => o.id !== objId);
+            if (updated.length === 0) {
+                this.objectsByScript.delete(script);
+            } else if (updated.length !== objects.length) {
+                this.objectsByScript.set(script, updated);
+            }
+        });
+        
+        // Clean up script instance if it exists
+        if (this.scriptInstances.has(objId)) {
+            this.scriptInstances.delete(objId);
+        }
+    }
+
+    serializeAllScriptProperties() {
+        const serializedData = {};
+        
+        this.engine.objects.forEach(obj => {
+            if (obj.scriptProperties || (obj.scriptInstance && obj.scriptInstance._properties)) {
+                // Get the most up-to-date properties
+                const props = obj.scriptInstance ? 
+                    obj.scriptInstance._properties : obj.scriptProperties;
+                
+                if (props && Object.keys(props).length > 0) {
+                    serializedData[obj.id] = {
+                        properties: {...props},
+                        scriptName: obj.scriptInstance ? obj.scriptInstance.scriptName : "Unknown"
+                    };
+                }
+            }
+        });
+        
+        return serializedData;
+    }
+    
+    deserializeAllScriptProperties(data) {
+        if (!data) return;
+        
+        Object.entries(data).forEach(([objId, scriptData]) => {
+            const obj = this.engine.getObjectById(objId);
+            if (obj) {
+                // Store properties to be applied when script is initialized
+                obj.scriptProperties = scriptData.properties;
+                
+                // If script is already running, update it immediately
+                if (obj.scriptInstance) {
+                    Object.assign(obj.scriptInstance._properties, scriptData.properties);
+                }
+            }
+        });
+    }
+
     createTween(target, properties, duration, easing = 'linear', onComplete = null) {
         const tween = new Tween(target, properties, duration, easing, onComplete);
         this.tweens.push(tween);
         return tween;
     }
     
-    // Update all active tweens
+    /**
+     * Updates all active tweens
+     * @param {number} deltaTime - Time since last frame in seconds
+     */
     updateTweens(deltaTime) {
         // Update all tweens
         for (let i = this.tweens.length - 1; i >= 0; i--) {
@@ -364,46 +536,24 @@ export class ScriptingSystem {
             }
         }
     }
-    
-    // Stop all tweens for a specific target
-    stopTweens(target) {
-        this.tweens = this.tweens.filter(tween => {
-            if (tween.target === target) {
-                tween.stop();
-                return false;
-            }
-            return true;
-        });
-    }
-    
-    // Add a game loop callback
-    addLoopCallback(type, callback, context) {
-        return this.gameLoop.addCallback(type, callback, context);
-    }
-    
-    // Remove a game loop callback
-    removeLoopCallback(type, callback, context) {
-        return this.gameLoop.removeCallback(type, callback, context);
-    }
-    
-    // Cache an item
-    cacheItem(key, value, expirySeconds = null) {
-        return this.cache.set(key, value, expirySeconds);
-    }
-    
-    // Get a cached item
-    getCachedItem(key) {
-        return this.cache.get(key);
-    }
-    
-    // Clear cache
-    clearCache() {
-        return this.cache.clear();
-    }
-    
+
     /**
-     * Creates a script instance for an object
+     * Updates all active timers
+     * @param {number} deltaTime - Time since last frame in seconds
      */
+    updateTimers(deltaTime) {
+        // Update all timers
+        for (let i = this.timers.length - 1; i >= 0; i--) {
+            const timer = this.timers[i];
+            timer.update(deltaTime);
+            
+            // Remove completed non-repeating timers
+            if (timer.isCompleted && !timer.repeat) {
+                this.timers.splice(i, 1);
+            }
+        }
+    }
+
     createScriptInstance(obj) {
         if (!obj.script) return null;
         
@@ -414,6 +564,87 @@ export class ScriptingSystem {
             if (firstLineMatch) {
                 extractedScriptName = firstLineMatch[1].trim();
             }
+            
+            const enhancedScript = `
+                // Add state machine support
+                const stateMachine = new this.Containers.StateMachine();
+                
+                // Add debug utilities
+                const Debug = {
+                    drawLine: (start, end, color = 0xff0000, duration = 1) => {
+                        const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
+                        const material = new THREE.LineBasicMaterial({ color });
+                        const line = new THREE.Line(geometry, material);
+                        this.scene.add(line);
+                        setTimeout(() => this.scene.remove(line), duration * 1000);
+                    },
+                    
+                    drawSphere: (center, radius, color = 0xff0000, duration = 1) => {
+                        const geometry = new THREE.SphereGeometry(radius, 8, 8);
+                        const material = new THREE.MeshBasicMaterial({ 
+                            color, 
+                            wireframe: true 
+                        });
+                        const mesh = new THREE.Mesh(geometry, material);
+                        mesh.position.copy(center);
+                        this.scene.add(mesh);
+                        setTimeout(() => this.scene.remove(mesh), duration * 1000);
+                    },
+                    
+                    log: (...args) => console.log(...args),
+                    warn: (...args) => console.warn(...args),
+                    error: (...args) => console.error(...args)
+                };
+                
+                // Enhanced coroutine utilities
+                function waitForSeconds(seconds) {
+                    let elapsed = 0;
+                    return function*() {
+                        while(elapsed < seconds) {
+                            elapsed += yield;
+                        }
+                    };
+                }
+                
+                function waitUntil(condition) {
+                    return function*() {
+                        while(!condition()) yield;
+                    };
+                }
+                
+                // Entity query support
+                function findEntitiesWithComponent(componentType) {
+                    return this.engine.ecs.queryEntities(componentType);
+                }
+                
+                // Tween integration
+                function createTween(target, properties, duration, easing = 'linear') {
+                    return this.engine.scriptingSystem.createTween(
+                        target, properties, duration, easing
+                    );
+                }
+                
+                // Timer management
+                function createTimer(delay, callback, repeats = false) {
+                    const timer = new Timer(callback, delay, repeats);
+                    this.engine.scriptingSystem.timers.push(timer);
+                    return timer;
+                }
+                
+                // Add these utilities to script context
+                Object.assign(this, {
+                    Debug,
+                    stateMachine,
+                    waitForSeconds,
+                    waitUntil,
+                    findEntitiesWithComponent,
+                    createTween,
+                    createTimer,
+                    THREE: THREE // Explicitly expose THREE
+                });
+                
+                ${obj.script}
+            `;
             
             // Create a class from the script content
             const scriptCode = `
@@ -454,262 +685,103 @@ export class ScriptingSystem {
                         
                         // Make Math utilities available
                         this.Math = {
-                            // Vector utilities
-                            Vector: {
-                                randomDirection() {
-                                    const vec = new THREE.Vector3(
-                                        Math.random() * 2 - 1,
-                                        Math.random() * 2 - 1,
-                                        Math.random() * 2 - 1
-                                    );
-                                    return vec.normalize();
-                                },
-                                
-                                randomInSphere(radius) {
-                                    const vec = this.randomDirection();
-                                    return vec.multiplyScalar(Math.random() * radius);
-                                },
-                                
-                                randomInCircle(radius) {
-                                    const angle = Math.random() * Math.PI * 2;
-                                    return new THREE.Vector2(
-                                        Math.cos(angle) * radius * Math.sqrt(Math.random()),
-                                        Math.sin(angle) * radius * Math.sqrt(Math.random())
-                                    );
-                                }
+                            // Vector classes
+                            Vector2: THREE.Vector2,
+                            Vector3: THREE.Vector3,
+                            Vector4: THREE.Vector4,
+                            
+                            // Basic math helpers
+                            lerp: (a, b, t) => a + (b - a) * t,
+                            clamp: (val, min, max) => Math.min(Math.max(val, min), max),
+                            smoothStep: (min, max, value) => {
+                                const x = Math.max(0, Math.min(1, (value-min)/(max-min)));
+                                return x*x*(3 - 2*x);
                             },
                             
-                            // Angle utilities
-                            Angle: {
-                                toDegrees: radians => radians * (180 / Math.PI),
-                                toRadians: degrees => degrees * (Math.PI / 180),
+                            // Angle conversions
+                            toRadians: degrees => degrees * (Math.PI / 180),
+                            toDegrees: radians => radians * (180 / Math.PI),
+                            
+                            // Random utilities
+                            random: (min, max) => min + Math.random() * (max - min),
+                            randomInt: (min, max) => Math.floor(min + Math.random() * (max - min + 1)),
+                            randomFrom: array => array[Math.floor(Math.random() * array.length)],
+                            weightedRandom: weights => {
+                                const totalWeight = weights.reduce((sum, option) => sum + option.weight, 0);
+                                let random = Math.random() * totalWeight;
                                 
-                                lerpAngle(a, b, t) {
-                                    let delta = b - a;
-                                    while (delta > Math.PI) delta -= Math.PI * 2;
-                                    while (delta < -Math.PI) delta += Math.PI * 2;
-                                    return a + delta * Math.clamp01(t);
-                                },
-                                
-                                angleBetween(a, b) {
-                                    return Math.acos(a.dot(b) / (a.length() * b.length()));
+                                for (const option of weights) {
+                                    random -= option.weight;
+                                    if (random <= 0) return option.value;
                                 }
+                                return weights[weights.length - 1].value;
                             },
                             
-                            // Interpolation functions
-                            Interpolation: {
-                                lerp: (start, end, t) => start + (end - start) * t,
-                                
-                                smoothStep: (edge0, edge1, x) => {
-                                    const t = Math.clamp01((x - edge0) / (edge1 - edge0));
-                                    return t * t * (3 - 2 * t);
-                                },
-                                
-                                smootherStep: (edge0, edge1, x) => {
-                                    const t = Math.clamp01((x - edge0) / (edge1 - edge0));
-                                    return t * t * t * (t * (t * 6 - 15) + 10);
-                                }
-                            },
+                            // Quaternion wrapper
+                            Quaternion: THREE.Quaternion,
                             
-                            // Random number utilities
-                            Random: {
-                                range: (min, max) => min + Math.random() * (max - min),
-                                rangeInt: (min, max) => Math.floor(min + Math.random() * (max - min + 1)),
-                                
-                                weighted(weights) {
-                                    const sum = weights.reduce((a, b) => a + b, 0);
-                                    let value = Math.random() * sum;
-                                    
-                                    for (let i = 0; i < weights.length; i++) {
-                                        value -= weights[i];
-                                        if (value <= 0) return i;
-                                    }
-                                    return weights.length - 1;
-                                },
-                                
-                                onUnitSphere() {
-                                    const theta = Math.random() * Math.PI * 2;
-                                    const phi = Math.acos(Math.random() * 2 - 1);
-                                    return new THREE.Vector3(
-                                        Math.sin(phi) * Math.cos(theta),
-                                        Math.sin(phi) * Math.sin(theta),
-                                        Math.cos(phi)
-                                    );
-                                }
+                            // Noise functions (placeholders)
+                            Noise: {
+                                perlin1D: x => Math.sin(x) * 0.5 + 0.5,
+                                perlin2D: (x, y) => Math.sin(x * 0.1) * Math.cos(y * 0.1) * 0.5 + 0.5,
+                                perlin3D: (x, y, z) => Math.sin(x * 0.1) * Math.cos(y * 0.1) * Math.sin(z * 0.1) * 0.5 + 0.5,
+                                simplex2D: (x, y) => Math.sin(x * 0.1 + y * 0.1) * 0.5 + 0.5
                             },
                             
                             // Easing functions
                             Easing: {
-                                linear: t => t,
-                                
                                 easeInQuad: t => t * t,
                                 easeOutQuad: t => t * (2 - t),
                                 easeInOutQuad: t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
-                                
                                 easeInCubic: t => t * t * t,
                                 easeOutCubic: t => (--t) * t * t + 1,
                                 easeInOutCubic: t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
-                                
-                                easeInElastic(t) {
-                                    if (t === 0) return 0;
-                                    if (t === 1) return 1;
-                                    return -Math.pow(2, 10 * (t - 1)) * Math.sin((t - 1.1) * 5 * Math.PI);
-                                },
-                                
-                                easeOutElastic(t) {
-                                    if (t === 0) return 0;
-                                    if (t === 1) return 1;
-                                    return Math.pow(2, -10 * t) * Math.sin((t - 0.1) * 5 * Math.PI) + 1;
-                                },
-                                
-                                bounce(t) {
-                                    if (t < (1/2.75)) {
+                                bounceOut: t => {
+                                    if (t < 1/2.75) {
                                         return 7.5625 * t * t;
-                                    } else if (t < (2/2.75)) {
-                                        return 7.5625 * (t -= (1.5/2.75)) * t + 0.75;
-                                    } else if (t < (2.5/2.75)) {
-                                        return 7.5625 * (t -= (2.25/2.75)) * t + 0.9375;
+                                    } else if (t < 2/2.75) {
+                                        return 7.5625 * (t -= 1.5/2.75) * t + 0.75;
+                                    } else if (t < 2.5/2.75) {
+                                        return 7.5625 * (t -= 2.25/2.75) * t + 0.9375;
                                     } else {
-                                        return 7.5625 * (t -= (2.625/2.75)) * t + 0.984375;
+                                        return 7.5625 * (t -= 2.625/2.75) * t + 0.984375;
                                     }
                                 }
                             },
                             
-                            // Geometry utilities
+                            // Geometry helpers
                             Geometry: {
-                                // Line-line intersection
-                                lineIntersection(p1, p2, p3, p4) {
-                                    const denominator = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
-                                    if (denominator === 0) return null;
-                                    
-                                    const ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denominator;
-                                    const ub = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denominator;
-                                    
-                                    if (ua < 0 || ua > 1 || ub < 0 || ub > 1) return null;
-                                    
-                                    return new THREE.Vector2(
-                                        p1.x + ua * (p2.x - p1.x),
-                                        p1.y + ua * (p2.y - p1.y)
-                                    );
+                                isPointInSphere: (point, center, radius) => point.distanceTo(center) <= radius,
+                                sphereOverlap: (center1, radius1, center2, radius2) => center1.distanceTo(center2) <= (radius1 + radius2),
+                                closestPointOnLine: (point, lineStart, lineEnd) => {
+                                    const line = new THREE.Line3(lineStart, lineEnd);
+                                    return line.closestPointToPoint(point, true, new THREE.Vector3());
                                 },
-                                
-                                // Point in polygon test
-                                pointInPolygon(point, vertices) {
-                                    let inside = false;
-                                    for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
-                                        const xi = vertices[i].x, yi = vertices[i].y;
-                                        const xj = vertices[j].x, yj = vertices[j].y;
-                                        
-                                        if (((yi > point.y) !== (yj > point.y)) &&
-                                            (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi)) {
-                                            inside = !inside;
-                                        }
+                                lineIntersection: (a1, a2, b1, b2) => {
+                                    const det = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
+                                    if (det === 0) return null;
+                                    const lambda = ((b2.y - b1.y) * (b2.x - a1.x) + (b1.x - b2.x) * (b2.y - a1.y)) / det;
+                                    const gamma = ((a1.y - a2.y) * (b2.x - a1.x) + (a2.x - a1.x) * (b2.y - a1.y)) / det;
+                                    if (lambda >= 0 && lambda <= 1 && gamma >= 0 && gamma <= 1) {
+                                        return new THREE.Vector2(a1.x + lambda * (a2.x - a1.x), a1.y + lambda * (a2.y - a1.y));
                                     }
-                                    return inside;
-                                },
-                                
-                                // Distance from point to line segment
-                                pointLineDistance(point, lineStart, lineEnd) {
-                                    const L2 = lineStart.distanceToSquared(lineEnd);
-                                    if (L2 === 0) return point.distanceTo(lineStart);
-                                    
-                                    const t = Math.max(0, Math.min(1, point.clone().sub(lineStart).dot(lineEnd.clone().sub(lineStart)) / L2));
-                                    const projection = lineStart.clone().lerp(lineEnd, t);
-                                    
-                                    return point.distanceTo(projection);
+                                    return null;
                                 }
                             },
                             
-                            // Noise functions (Perlin-like simplex noise approximation)
-                            Noise: {
-                                seed: Math.random(),
-                                
-                                setSeed(seed) {
-                                    this.seed = seed;
-                                },
-                                
-                                noise2D(x, y) {
-                                    const X = Math.floor(x) & 255;
-                                    const Y = Math.floor(y) & 255;
-                                    
-                                    x -= Math.floor(x);
-                                    y -= Math.floor(y);
-                                    
-                                    const u = this.fade(x);
-                                    const v = this.fade(y);
-                                    
-                                    const A = (this.p[X] + Y) & 255;
-                                    const B = (this.p[X + 1] + Y) & 255;
-                                    
-                                    return this.lerp(
-                                        this.lerp(
-                                            this.grad(this.p[A], x, y),
-                                            this.grad(this.p[B], x - 1, y),
-                                            u
-                                        ),
-                                        this.lerp(
-                                            this.grad(this.p[A + 1], x, y - 1),
-                                            this.grad(this.p[B + 1], x - 1, y - 1),
-                                            u
-                                        ),
-                                        v
-                                    );
-                                },
-                                
-                                fade(t) {
-                                    return t * t * t * (t * (t * 6 - 15) + 10);
-                                },
-                                
-                                lerp(a, b, t) {
-                                    return (1 - t) * a + t * b;
-                                },
-                                
-                                grad(hash, x, y) {
-                                    const h = hash & 15;
-                                    const grad = 1 + (h & 7);
-                                    return ((h & 8) ? -grad : grad) * x + ((h & 4) ? -grad : grad) * y;
-                                },
-                                
-                                // Permutation table
-                                p: (() => {
-                                    const p = new Array(512);
-                                    for (let i = 0; i < 256; i++) p[i] = i;
-                                    for (let i = 0; i < 256; i++) {
-                                        const j = Math.floor(Math.random() * (256 - i)) + i;
-                                        [p[i], p[j]] = [p[j], p[i]];
-                                        p[i + 256] = p[i];
-                                    }
-                                    return p;
-                                })()
-                            },
-                            
-                            // Spline interpolation
-                            Spline: {
-                                catmullRom(p0, p1, p2, p3, t) {
-                                    const v0 = (p2 - p0) * 0.5;
-                                    const v1 = (p3 - p1) * 0.5;
-                                    const t2 = t * t;
-                                    const t3 = t * t2;
-                                    
-                                    return (2 * p1 - 2 * p2 + v0 + v1) * t3 +
-                                           (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 +
-                                           v0 * t + p1;
-                                },
-                                
-                                bezier(p0, p1, p2, p3, t) {
-                                    const t2 = t * t;
-                                    const t3 = t2 * t;
-                                    const mt = 1 - t;
-                                    const mt2 = mt * mt;
-                                    const mt3 = mt2 * mt;
-                                    
-                                    return p0 * mt3 + 3 * p1 * mt2 * t + 3 * p2 * mt * t2 + p3 * t3;
+                            // Ray casting
+                            Ray: class extends THREE.Ray {
+                                constructor(origin, direction) {
+                                    super(origin, direction);
+                                }
+                                intersectSphere(center, radius, target = new THREE.Vector3()) {
+                                    return super.intersectSphere(new THREE.Sphere(center, radius), target);
                                 }
                             }
                         };
                         
-                        // Container data structures
-                        this.Containers = {
+                        // Container data structures (Grid, Pool, QuadTree, Queue, StateMachine)
+                        this.Containers = { 
                             // 2D Grid for tile-based games
                             Grid: class {
                                 constructor(width, height, defaultValue = null) {
@@ -1486,15 +1558,62 @@ export class ScriptingSystem {
                         return this.assets.createMaterialFromTexture(textureUrl, materialType, properties);
                     }
                     
-                    ${obj.script}
+                    // Add the newly requested lifecycle functions
+                    gameLoop() {
+                        // Main game loop function that manages the overall flow
+                        console.log("gameLoop called");
+                    }
+
+                    update(deltaTime) {
+                        // Called every frame with time difference in seconds
+                        // This method is already part of the script lifecycle
+                    }
+
+                    debug() {
+                        // For debugging functionality during development
+                        console.log("debug called", this);
+                        
+                        // Return useful debug info
+                        return {
+                            name: this.object.name,
+                            position: this.transform.position.clone(),
+                            properties: this._properties
+                        };
+                    }
+                    
+                    fixedUpdate(fixedDeltaTime) {
+                        // Physics and other time-sensitive updates at fixed intervals
+                        // Called at consistent time intervals regardless of frame rate
+                    }
+                    
+                    onDestroy() {
+                        // Called when object is being destroyed
+                        // Clean up resources and event listeners
+                        this._cleanupEventSubscriptions();
+                        
+                        for (const behavior of this._behaviors) {
+                            if (typeof behavior.onDestroy === 'function') {
+                                behavior.onDestroy();
+                            }
+                        }
+                    }
+                    
+                    lateUpdate(deltaTime) {
+                        // Called after all objects' updates have been called
+                        // Good for camera follow and finalization logic
+                    }
+                    
+                    init() {
+                        // Initialization function that can be called manually
+                        // Useful for setup that doesn't fit in awake/start lifecycle
+                        console.log("Manually initializing " + this.object.name);
+                        return true;
+                    }
                 }
-                return new ObjectScript(objectRef, engineRef);
             `;
             
-            // Execute the script in a controlled context with access to the object and engine
-            const objectRef = obj;
-            const engineRef = this.engine;
-            const scriptInstance = new Function('objectRef', 'engineRef', scriptCode)(objectRef, engineRef);
+            // Create a script instance with enhanced features
+            const scriptInstance = new Function('THREE', 'Behaviors', 'objectRef', 'engineRef', scriptCode)(THREE, Behaviors, obj, this.engine);
             
             // Store the instance
             this.scriptInstances.set(obj.id, scriptInstance);
@@ -1517,9 +1636,6 @@ export class ScriptingSystem {
         }
     }
     
-    /**
-     * Initialize scripts when entering play mode
-     */
     initializeScripts() {
         this.scriptInstances.clear();
         
@@ -1529,17 +1645,22 @@ export class ScriptingSystem {
                 obj.scriptInstance = null;
             }
         });
+        
+        // Reset any tags and script references
+        this.objectsByTag.clear();
+        this.objectsByScript.clear();
+        this.weakRefs = new WeakMap();
     }
-    
-    /**
-     * Update all scripts
-     */
+
     updateScripts(deltaTime) {
         // Update game loop
         this.gameLoop.update(deltaTime);
         
         // Update tweens
         this.updateTweens(deltaTime);
+        
+        // Update timers
+        this.updateTimers(deltaTime);
         
         // Update all script instances
         this.engine.objects.forEach(obj => {
@@ -1600,15 +1721,13 @@ export class ScriptingSystem {
         });
     }
     
-    /**
-     * Hot reload a script while preserving its properties
-     */
     hotReloadScript(obj) {
         if (!obj.script) return false;
         
         try {
             // Save current property state if instance exists
-            const props = obj.scriptInstance ? obj.scriptInstance._properties : {};
+            const props = obj.scriptInstance ? 
+                obj.scriptInstance._properties : {};
             
             // Create a new script instance
             obj.scriptInitialized = false;
@@ -1633,9 +1752,6 @@ export class ScriptingSystem {
         return false;
     }
     
-    /**
-     * Validate script syntax without executing
-     */
     validateScript(scriptCode) {
         try {
             // Validate script by creating a class prototype
@@ -1663,48 +1779,14 @@ export class ScriptingSystem {
         }
     }
     
-    /**
-     * Clean up when exiting play mode
-     */
     cleanupScripts() {
-        this.engine.objects.forEach(obj => {
-            if (obj.scriptInstance) {
-                // Store serialized properties for next play session
-                if (obj.scriptInstance._properties) {
-                    obj.scriptProperties = {...obj.scriptInstance._properties};
-                }
-                
-                // Clean up event subscriptions
-                if (obj.scriptInstance._cleanupEventSubscriptions) {
-                    obj.scriptInstance._cleanupEventSubscriptions();
-                }
-                
-                // Clean up any tweens for this object
-                this.stopTweens(obj.object3D);
-                
-                // Remove game loop callbacks for this instance
-                this.gameLoop.removeCallback('update', obj.scriptInstance.update, obj.scriptInstance);
-                this.gameLoop.removeCallback('fixedUpdate', obj.scriptInstance.fixedUpdate, obj.scriptInstance);
-                this.gameLoop.removeCallback('lateUpdate', obj.scriptInstance.lateUpdate, obj.scriptInstance);
-                
-                // Call lifecycle methods
-                if (typeof obj.scriptInstance.onDisable === 'function') {
-                    try {
-                        obj.scriptInstance.onDisable();
-                    } catch (e) {
-                        console.error(`Error in onDisable for ${obj.name}:`, e);
-                    }
-                }
-                
-                obj.scriptInstance = null;
-            }
-        });
+        // ... existing code ...
         
-        // Clear all tweens and game loop callbacks
-        this.tweens = [];
-        this.gameLoop.clear();
+        // Also terminate any web workers
+        if (this.engine.ecs) {
+            this.engine.ecs.terminateAllWorkers();
+        }
         
-        this.scriptInstances.clear();
-        this.objectsByScript.clear();
+        // ... existing code ...
     }
 }

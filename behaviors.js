@@ -669,6 +669,8 @@ export class StateMachine extends Behavior {
         this.states = {};
         this.currentState = null;
         this.previousState = null;
+        this.stateStack = [];
+        this.globalTransitions = [];
     }
     
     addState(name, callbacks) {
@@ -693,6 +695,16 @@ export class StateMachine extends Behavior {
     update(deltaTime) {
         if (!this.enabled || !this.currentState) return;
         
+        // Check global transitions
+        if (this.globalTransitions) {
+            for (const trans of this.globalTransitions) {
+                if (this.currentState === trans.fromState && trans.condition()) {
+                    this.transition(trans.toState);
+                    break;
+                }
+            }
+        }
+        
         // Call current state's update method
         if (this.currentState.onUpdate) {
             this.currentState.onUpdate.call(this.script, deltaTime);
@@ -715,6 +727,24 @@ export class StateMachine extends Behavior {
         if (this.currentState.onEnter) {
             this.currentState.onEnter.call(this.script);
         }
+    }
+    
+    pushState(stateName) {
+        if (this.currentState === stateName) return;
+        this.stateStack.push(stateName);
+        this.transition(stateName);
+    }
+    
+    popState() {
+        if (this.stateStack.length > 1) {
+            this.stateStack.pop();
+            this.transition(this.stateStack[this.stateStack.length-1]);
+        }
+    }
+    
+    addGlobalTransition(fromState, toState, condition) {
+        this.globalTransitions = this.globalTransitions || [];
+        this.globalTransitions.push({ fromState, toState, condition });
     }
     
     getCurrentState() {

@@ -1,0 +1,574 @@
+{
+  "lifecycle": [
+    {
+      "name": "awake",
+      "description": "Called once when script is first initialized",
+      "parameters": [],
+      "returnType": "void",
+      "example": "awake() {\n  console.log('Script initialized');\n  this.setProperty('speed', 5);\n}"
+    },
+    {
+      "name": "start",
+      "description": "Called right before the first update frame",
+      "parameters": [],
+      "returnType": "void",
+      "example": "start() {\n  this.speed = this.getProperty('speed', 5);\n  this.startCoroutine(this.moveObject());\n}"
+    },
+    {
+      "name": "update",
+      "description": "Called every frame with time in seconds since last frame",
+      "parameters": [
+        {
+          "name": "deltaTime",
+          "type": "number",
+          "description": "Time in seconds since last frame"
+        }
+      ],
+      "returnType": "void",
+      "example": "update(deltaTime) {\n  this.transform.rotation.y += this.speed * deltaTime;\n}"
+    },
+    {
+      "name": "lateUpdate",
+      "description": "Called after all objects' update methods have been called",
+      "parameters": [
+        {
+          "name": "deltaTime",
+          "type": "number",
+          "description": "Time in seconds since last frame"
+        }
+      ],
+      "returnType": "void",
+      "example": "lateUpdate(deltaTime) {\n  // Camera follow logic here\n}"
+    },
+    {
+      "name": "onEnable",
+      "description": "Called when the script becomes active",
+      "parameters": [],
+      "returnType": "void",
+      "example": "onEnable() {\n  console.log('Script enabled');\n}"
+    },
+    {
+      "name": "onDisable",
+      "description": "Called when the script becomes inactive",
+      "parameters": [],
+      "returnType": "void",
+      "example": "onDisable() {\n  console.log('Script disabled');\n  this.off('collision', this.handleCollision);\n}"
+    },
+    {
+      "name": "gameLoop",
+      "description": "Main game loop function that manages the overall game flow",
+      "parameters": [],
+      "returnType": "void",
+      "example": "gameLoop() {\n  // Manage overall game loop logic\n}"
+    },
+    {
+      "name": "fixedUpdate",
+      "description": "Called at fixed time intervals, best for physics and time-sensitive calculations",
+      "parameters": [
+        {
+          "name": "fixedDeltaTime",
+          "type": "number",
+          "description": "Fixed time step in seconds (usually 1/60s)"
+        }
+      ],
+      "returnType": "void",
+      "example": "fixedUpdate(fixedDeltaTime) {\n  // Physics calculations here\n  this.applyGravity(fixedDeltaTime);\n}"
+    },
+    {
+      "name": "debug",
+      "description": "Debugging function that returns object state information",
+      "parameters": [],
+      "returnType": "Object",
+      "example": "debug() {\n  return {\n    position: this.transform.position,\n    health: this._properties.health\n  };\n}"
+    },
+    {
+      "name": "init",
+      "description": "Manual initialization function that can be called when needed",
+      "parameters": [],
+      "returnType": "boolean",
+      "example": "init() {\n  // Manual setup code\n  return true; // Return success state\n}"
+    },
+    {
+      "name": "onDestroy",
+      "description": "Called when the object is being destroyed",
+      "parameters": [],
+      "returnType": "void",
+      "example": "onDestroy() {\n  // Clean up resources\n  this.disconnectFromServer();\n}"
+    }
+  ],
+  "coroutines": [
+    {
+      "name": "startCoroutine",
+      "description": "Starts a coroutine function using JavaScript generators",
+      "parameters": [
+        {
+          "name": "generator",
+          "type": "Generator",
+          "description": "Generator function to run as coroutine"
+        }
+      ],
+      "returnType": "Object",
+      "example": "startCoroutine(this.fadeIn());\n\n*fadeIn() {\n  for(let a = 0; a <= 1; a += 0.1) {\n    this.material.opacity = a;\n    yield; // Wait until next frame\n  }\n}"
+    },
+    {
+      "name": "stopCoroutine",
+      "description": "Stops a running coroutine",
+      "parameters": [
+        {
+          "name": "coroutine",
+          "type": "Object",
+          "description": "Coroutine to stop"
+        }
+      ],
+      "returnType": "void",
+      "example": "const routine = this.startCoroutine(this.fadeIn());\nthis.stopCoroutine(routine);"
+    },
+    {
+      "name": "waitForSeconds",
+      "description": "Helper that creates a coroutine generator to wait for seconds",
+      "parameters": [
+        {
+          "name": "seconds",
+          "type": "number",
+          "description": "Number of seconds to wait"
+        }
+      ],
+      "returnType": "Generator",
+      "example": "yield* this.waitForSeconds(2.0);"
+    }
+  ],
+  "input": [
+    {
+      "name": "isKeyPressed",
+      "description": "Checks if a key is currently held down",
+      "parameters": [
+        {
+          "name": "keyCode",
+          "type": "string",
+          "description": "Key code to check (e.g., 'KeyW', 'Space', 'ArrowUp')"
+        }
+      ],
+      "returnType": "boolean",
+      "example": "if (this.isKeyPressed('Space')) {\n  this.jump();\n}"
+    },
+    {
+      "name": "isKeyDown",
+      "description": "Checks if a key was just pressed this frame",
+      "parameters": [
+        {
+          "name": "keyCode",
+          "type": "string",
+          "description": "Key code to check"
+        }
+      ],
+      "returnType": "boolean",
+      "example": "if (this.isKeyDown('KeyE')) {\n  this.interact();\n}"
+    },
+    {
+      "name": "isKeyUp",
+      "description": "Checks if a key was just released this frame",
+      "parameters": [
+        {
+          "name": "keyCode",
+          "type": "string",
+          "description": "Key code to check"
+        }
+      ],
+      "returnType": "boolean",
+      "example": "if (this.isKeyUp('ShiftLeft')) {\n  this.stopRunning();\n}"
+    },
+    {
+      "name": "getMousePosition",
+      "description": "Gets normalized mouse position (-1 to 1)",
+      "parameters": [],
+      "returnType": "Object",
+      "example": "const mouse = this.getMousePosition();\nconsole.log(`Mouse at: ${mouse.x}, ${mouse.y}`);"
+    },
+    {
+      "name": "getMouseWorldPosition",
+      "description": "Gets mouse position in world space",
+      "parameters": [],
+      "returnType": "Vector3",
+      "example": "const worldPos = this.getMouseWorldPosition();\nthis.object.position.copy(worldPos);"
+    },
+    {
+      "name": "isMouseButtonPressed",
+      "description": "Checks if mouse button is held down",
+      "parameters": [
+        {
+          "name": "button",
+          "type": "string",
+          "description": "Button to check ('left', 'middle', 'right')"
+        }
+      ],
+      "returnType": "boolean",
+      "example": "if (this.isMouseButtonPressed('left')) {\n  this.shoot();\n}"
+    }
+  ],
+  "events": [
+    {
+      "name": "on",
+      "description": "Subscribe to an event",
+      "parameters": [
+        {
+          "name": "eventName",
+          "type": "string",
+          "description": "Name of the event to listen for"
+        },
+        {
+          "name": "callback",
+          "type": "Function",
+          "description": "Function to call when event fires"
+        }
+      ],
+      "returnType": "Object",
+      "example": "this.on('collision', this.handleCollision);"
+    },
+    {
+      "name": "off",
+      "description": "Unsubscribe from an event",
+      "parameters": [
+        {
+          "name": "eventName",
+          "type": "string",
+          "description": "Name of the event"
+        },
+        {
+          "name": "callback",
+          "type": "Function",
+          "description": "Callback to remove"
+        }
+      ],
+      "returnType": "void",
+      "example": "this.off('collision', this.handleCollision);"
+    },
+    {
+      "name": "emit",
+      "description": "Emit an event",
+      "parameters": [
+        {
+          "name": "eventName",
+          "type": "string",
+          "description": "Name of the event to emit"
+        },
+        {
+          "name": "data",
+          "type": "Object",
+          "description": "Data to pass to event handlers"
+        }
+      ],
+      "returnType": "void",
+      "example": "this.emit('playerDamaged', { amount: 10 });"
+    }
+  ],
+  "properties": [
+    {
+      "name": "setProperty",
+      "description": "Save a property that will be serialized with the object",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Property name"
+        },
+        {
+          "name": "value",
+          "type": "any",
+          "description": "Property value"
+        }
+      ],
+      "returnType": "void",
+      "example": "this.setProperty('health', 100);"
+    },
+    {
+      "name": "getProperty",
+      "description": "Get a saved property with optional default value",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Property name"
+        },
+        {
+          "name": "defaultValue",
+          "type": "any",
+          "description": "Default value if property doesn't exist"
+        }
+      ],
+      "returnType": "any",
+      "example": "this.health = this.getProperty('health', 100);"
+    }
+  ],
+  "tags": [
+    {
+      "name": "addTag",
+      "description": "Add a tag to this object",
+      "parameters": [
+        {
+          "name": "tag",
+          "type": "string",
+          "description": "Tag name to add"
+        }
+      ],
+      "returnType": "void",
+      "example": "this.addTag('enemy');"
+    },
+    {
+      "name": "removeTag",
+      "description": "Remove a tag from this object",
+      "parameters": [
+        {
+          "name": "tag",
+          "type": "string",
+          "description": "Tag name to remove"
+        }
+      ],
+      "returnType": "void",
+      "example": "this.removeTag('enemy');"
+    },
+    {
+      "name": "hasTag",
+      "description": "Check if object has a tag",
+      "parameters": [
+        {
+          "name": "tag",
+          "type": "string",
+          "description": "Tag name to check"
+        }
+      ],
+      "returnType": "boolean",
+      "example": "if (this.hasTag('enemy')) {\n  // This is an enemy\n}"
+    },
+    {
+      "name": "findObjectsByTag",
+      "description": "Find all objects with a specific tag",
+      "parameters": [
+        {
+          "name": "tag",
+          "type": "string",
+          "description": "Tag to search for"
+        }
+      ],
+      "returnType": "Array",
+      "example": "const enemies = this.findObjectsByTag('enemy');"
+    }
+  ],
+  "objects": [
+    {
+      "name": "findObjectsByScript",
+      "description": "Find objects with a specific script",
+      "parameters": [
+        {
+          "name": "scriptName",
+          "type": "string",
+          "description": "Script name to search for"
+        }
+      ],
+      "returnType": "Array",
+      "example": "const players = this.findObjectsByScript('PlayerController');"
+    },
+    {
+      "name": "instantiate",
+      "description": "Create an instance of a prefab",
+      "parameters": [
+        {
+          "name": "prefabName",
+          "type": "string",
+          "description": "Name of the prefab to instantiate"
+        },
+        {
+          "name": "position",
+          "type": "Vector3",
+          "description": "Position to place the prefab"
+        },
+        {
+          "name": "rotation",
+          "type": "Euler",
+          "description": "Rotation to apply to the prefab"
+        }
+      ],
+      "returnType": "Object",
+      "example": "const enemy = this.instantiate('EnemyPrefab', new THREE.Vector3(0, 0, 5));"
+    },
+    {
+      "name": "findChild",
+      "description": "Find a child object by name",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Name of the child object"
+        }
+      ],
+      "returnType": "Object",
+      "example": "const weapon = this.findChild('Weapon');"
+    },
+    {
+      "name": "getChildren",
+      "description": "Get all child objects",
+      "parameters": [],
+      "returnType": "Array",
+      "example": "const children = this.getChildren();"
+    }
+  ],
+  "behaviors": [
+    {
+      "name": "addBehavior",
+      "description": "Add a behavior component to this script",
+      "parameters": [
+        {
+          "name": "behaviorClass",
+          "type": "Class",
+          "description": "Behavior class to instantiate"
+        },
+        {
+          "name": "...args",
+          "type": "any",
+          "description": "Arguments to pass to the behavior constructor"
+        }
+      ],
+      "returnType": "Behavior",
+      "example": "this.rotator = this.addBehavior(this.Behaviors.Rotator, { y: 1 });"
+    },
+    {
+      "name": "createTween",
+      "description": "Create a property animation tween",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "Object",
+          "description": "Object to animate"
+        },
+        {
+          "name": "properties",
+          "type": "Object",
+          "description": "End values for properties"
+        },
+        {
+          "name": "duration",
+          "type": "number",
+          "description": "Duration in seconds"
+        },
+        {
+          "name": "easing",
+          "type": "string",
+          "description": "Easing function name"
+        }
+      ],
+      "returnType": "Object",
+      "example": "this.createTween(this.transform.position, { y: 5 }, 2.0, 'easeOut');"
+    },
+    {
+      "name": "createTimer",
+      "description": "Create a timer that executes after a delay",
+      "parameters": [
+        {
+          "name": "delay",
+          "type": "number",
+          "description": "Delay in seconds"
+        },
+        {
+          "name": "callback",
+          "type": "Function",
+          "description": "Function to call when timer completes"
+        },
+        {
+          "name": "repeats",
+          "type": "boolean",
+          "description": "Whether timer should repeat"
+        }
+      ],
+      "returnType": "Object",
+      "example": "this.createTimer(2.0, () => this.spawnEnemy(), true);"
+    }
+  ],
+  "physics": [
+    {
+      "name": "applyForce",
+      "description": "Apply a physics force to the object",
+      "parameters": [
+        {
+          "name": "force",
+          "type": "Vector3",
+          "description": "Force vector to apply"
+        }
+      ],
+      "returnType": "void",
+      "example": "this.applyForce(new THREE.Vector3(0, 10, 0));"
+    },
+    {
+      "name": "setVelocity",
+      "description": "Set the physics velocity directly",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "number",
+          "description": "X component"
+        },
+        {
+          "name": "y",
+          "type": "number",
+          "description": "Y component"
+        },
+        {
+          "name": "z",
+          "type": "number",
+          "description": "Z component"
+        }
+      ],
+      "returnType": "void",
+      "example": "this.setVelocity(0, 5, 0);"
+    }
+  ],
+  "utils": [
+    {
+      "name": "Debug.drawLine",
+      "description": "Draw a debug line in the scene",
+      "parameters": [
+        {
+          "name": "start",
+          "type": "Vector3",
+          "description": "Start position"
+        },
+        {
+          "name": "end",
+          "type": "Vector3",
+          "description": "End position"
+        },
+        {
+          "name": "color",
+          "type": "number",
+          "description": "Color of the line"
+        },
+        {
+          "name": "duration",
+          "type": "number",
+          "description": "How long to show the line in seconds"
+        }
+      ],
+      "returnType": "void",
+      "example": "Debug.drawLine(this.transform.position, targetPos, 0xff0000, 1.0);"
+    },
+    {
+      "name": "enable",
+      "description": "Enable this script",
+      "parameters": [],
+      "returnType": "void",
+      "example": "this.enable();"
+    },
+    {
+      "name": "disable",
+      "description": "Disable this script",
+      "parameters": [],
+      "returnType": "void",
+      "example": "this.disable();"
+    },
+    {
+      "name": "isEnabled",
+      "description": "Check if script is enabled",
+      "parameters": [],
+      "returnType": "boolean",
+      "example": "if (this.isEnabled()) {\n  // Script is active\n}"
+    }
+  ]
+}

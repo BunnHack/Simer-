@@ -20,7 +20,7 @@ body, html {
     grid-template-areas: 
         "main-toolbar main-toolbar main-toolbar"
         "panels viewport inspector"
-        "assets assets assets"
+        "console-panel console-panel console-panel"
         "toolbar toolbar toolbar"
         "status status status";
     width: 100%;
@@ -64,6 +64,9 @@ body, html {
     background-color: #333333;
     padding: 8px 12px;
     border-bottom: 1px solid #444444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .panel-header h3 {
@@ -226,32 +229,42 @@ body, html {
 #main-toolbar {
     grid-area: main-toolbar;
     display: flex;
-    padding: 10px;
+    flex-direction: column;
     background-color: #333333;
     border-bottom: 1px solid #444444;
+}
+
+.toolbar-tabs {
+    display: flex;
+    margin: 0 10px;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border: 1px solid #444444;
+    background-color: #2a2a2a;
+    margin-right: 2px;
+    color: #aaa;
+}
+
+.tab.active {
+    background-color: #3a3a3a;
+    color: white;
+    border-bottom: none;
+}
+
+.toolbar-content {
+    display: flex;
+    padding: 10px;
     gap: 10px;
     align-items: center;
+    border-top: 1px solid #444444;
 }
 
-#main-toolbar button {
-    padding: 8px 14px;
-    background-color: #4b80ff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-#main-toolbar button:hover {
-    background-color: #5a8aff;
-}
-
-#main-toolbar button:active {
-    background-color: #3a70ee;
-}
-
-#main-toolbar .section {
+.toolbar-content .section {
     display: flex;
     gap: 6px;
     padding: 0 5px;
@@ -259,8 +272,16 @@ body, html {
     margin-right: 5px;
 }
 
-#main-toolbar .section:last-child {
+.toolbar-content .section:last-child {
     border-right: none;
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: flex;
 }
 
 .object-context-menu {
@@ -403,36 +424,42 @@ body, html {
     cursor: pointer;
 }
 
-.script-editor-info {
-    background-color: #2a2a2a;
-    padding: 10px 15px;
-    font-size: 13px;
-    border-bottom: 1px solid #444444;
-    color: #ccc;
-}
-
-.script-editor-info code {
-    background-color: #333;
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-family: 'Consolas', monospace;
-}
-
-.script-editor-info ul {
-    margin-left: 20px;
-    margin-bottom: 10px;
-}
-
-.script-editor-textarea {
+.script-editor-container {
     flex: 1;
+    overflow: auto;
     background-color: #1e1e1e;
-    color: #e0e0e0;
-    border: none;
-    padding: 15px;
+}
+
+.code-editor {
     font-family: 'Consolas', monospace;
     font-size: 14px;
     line-height: 1.5;
-    resize: none;
+    color: #e0e0e0;
+    min-height: 100%;
+    padding: 15px;
+    white-space: pre;
+    outline: none;
+    tab-size: 4;
+    -moz-tab-size: 4;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+.code-editor * {
+    font-family: 'Consolas', monospace;
+}
+
+.code-editor br {
+    display: block;
+    content: "";
+    margin-top: 0;
+}
+
+.code-editor div {
+    white-space: pre;
+    display: inline;
 }
 
 .script-editor-buttons {
@@ -464,10 +491,39 @@ body, html {
     background-color: #5a8aff;
 }
 
-.script-indicator {
-    width: 16px;
-    height: 16px;
-    margin-left: 6px;
+/* Syntax highlighting overrides */
+.hljs {
+    background: #1e1e1e !important;
+    padding: 0 !important;
+}
+
+.hljs-keyword {
+    color: #569cd6 !important;
+}
+
+.hljs-string {
+    color: #ce9178 !important;
+}
+
+.hljs-function {
+    color: #dcdcaa !important;
+}
+
+.hljs-comment {
+    color: #6a9955 !important;
+}
+
+.hljs-number {
+    color: #b5cea8 !important;
+}
+
+.hljs-literal {
+    color: #569cd6 !important;
+}
+
+/* Make editor content scrollable */
+.code-editor {
+    overflow: auto;
 }
 
 /* Assets Manager Modal Styling */
@@ -635,4 +691,106 @@ body, html {
     margin: 0;
     font-family: 'Consolas', monospace;
     font-size: 12px;
+}
+
+.add-components-btn {
+    padding: 4px 8px;
+    background-color: #444444;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.add-components-btn:hover {
+    background-color: #4b80ff;
+}
+
+/* Console styling */
+#console-panel {
+    grid-area: console-panel;
+    display: flex;
+    flex-direction: column;
+    background-color: #252525;
+    border-top: 1px solid #3a3a3a;
+    height: 150px;
+    overflow: hidden;
+}
+
+#console-panel .panel-header {
+    background-color: #333333;
+    padding: 8px 12px;
+    border-bottom: 1px solid #444444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#console-panel .panel-content {
+    padding: 10px;
+    overflow-y: auto;
+    flex: 1;
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+}
+
+#console-output {
+    white-space: pre-wrap;
+}
+
+#clear-console {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 3px 8px;
+    cursor: pointer;
+}
+
+#clear-console:hover {
+    background-color: #555;
+}
+
+.console-log {
+    color: #e0e0e0;
+    padding: 2px 0;
+}
+
+.console-info {
+    color: #4b80ff;
+    padding: 2px 0;
+}
+
+.console-warn {
+    color: #ffdd55;
+    padding: 2px 0;
+}
+
+.console-error {
+    color: #ff5555;
+    padding: 2px 0;
+}
+
+.transform-tools {
+    display: flex;
+    gap: 2px;
+}
+
+.transform-btn {
+    padding: 6px 10px;
+    background-color: #444;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.transform-btn.active {
+    background-color: #4b80ff;
+    color: white;
+}
+
+.transform-btn:hover:not(.active) {
+    background-color: #555;
 }

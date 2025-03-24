@@ -14,28 +14,21 @@
             }
         }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/postprocessing/EffectComposer.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/postprocessing/RenderPass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/postprocessing/OutlinePass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/postprocessing/ShaderPass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/postprocessing/UnrealBloomPass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/shaders/LuminosityHighPassShader.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/shaders/CopyShader.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/postprocessing/FilmPass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/shaders/FilmShader.js" defer></script>
 </head>
 <body>
     <div id="app">
         <div id="main-toolbar">
-            <div class="section">
-                <button id="new-scene">New Scene</button>
-                <button id="save-scene">Save Scene</button>
-                <button id="load-scene">Load Scene</button>
-            </div>
-            <div class="section">
-                <button id="main-add-cube">Cube</button>
-                <button id="main-add-sphere">Sphere</button>
-                <button id="main-add-light">Light</button>
-                <button id="main-add-camera">Camera</button>
-                <button id="main-add-script">Script</button>
-            </div>
-            <div class="section">
-                <button id="main-play">Play</button>
-                <button id="main-pause">Pause</button>
-                <button id="main-stop">Stop</button>
-                <button id="main-docs" onclick="window.open('docs.html', '_blank')">Documentation</button>
-            </div>
+            <!-- Tabs will be created dynamically by the UI.js script -->
         </div>
         <div id="viewport"></div>
         <div id="ui-panels">
@@ -56,12 +49,13 @@
                 <div class="no-selection">No object selected</div>
             </div>
         </div>
-        <div id="assets-manager">
+        <div id="console-panel">
             <div class="panel-header">
-                <h3>Assets Manager</h3>
+                <h3>Console</h3>
+                <button id="clear-console">Clear</button>
             </div>
-            <div class="panel-content" id="assets-container">
-                <div class="assets-grid"></div>
+            <div class="panel-content">
+                <div id="console-output"></div>
             </div>
         </div>
         <div id="toolbar">

@@ -16,7 +16,7 @@ export class ScriptEditor {
         // Header
         const header = document.createElement('div');
         header.className = 'script-editor-header';
-        header.innerHTML = `<h3>Script Editor - ${obj.name}</h3>`;
+        header.innerHTML = `<h3>Script Editor - ${obj.name}.js</h3>`;
         
         // Close button
         const closeBtn = document.createElement('button');
@@ -27,45 +27,67 @@ export class ScriptEditor {
         });
         header.appendChild(closeBtn);
         
-        // Info banner with documentation
-        const infoBanner = document.createElement('div');
-        infoBanner.className = 'script-editor-info';
-        infoBanner.innerHTML = `
-            <p>Write your object script here. Your script has access to:</p>
-            <ul>
-                <li><code>this.object</code> - Reference to the full object</li>
-                <li><code>this.transform</code> - The Three.js object (position, rotation, etc.)</li>
-                <li><code>this.engine</code> - Reference to the game engine</li>
-                <li><code>this.scene</code> - Reference to the Three.js scene</li>
-            </ul>
-            <p>Lifecycle hooks available:</p>
-            <ul>
-                <li><code>awake()</code> - Called when the script is first initialized</li>
-                <li><code>start()</code> - Called before the first update</li>
-                <li><code>update(deltaTime)</code> - Called every frame</li>
-                <li><code>lateUpdate(deltaTime)</code> - Called after all updates</li>
-                <li><code>onEnable()</code> - Called when script is enabled</li>
-                <li><code>onDisable()</code> - Called when script is disabled</li>
-            </ul>
-            <p>Advanced features:</p>
-            <ul>
-                <li><code>setProperty(key, value)</code>/<code>getProperty(key, defaultValue)</code> - Serializable properties</li>
-                <li><code>startCoroutine(function*)</code> - Start coroutine (generator function)</li>
-                <li><code>findChild(name)</code>/<code>getChildren()</code> - Hierarchy traversal</li>
-                <li><code>instantiate(prefabName, position, rotation)</code> - Create prefab instances</li>
-            </ul>
-        `;
+        // Create code editor with syntax highlighting (using pre and code tags instead of textarea)
+        const editorContainer = document.createElement('div');
+        editorContainer.className = 'script-editor-container';
         
-        // Text area for script
-        const scriptArea = document.createElement('textarea');
-        scriptArea.className = 'script-editor-textarea';
+        // Include highlight.js library
+        if (!document.getElementById('highlightjs-css')) {
+            const highlightCSS = document.createElement('link');
+            highlightCSS.id = 'highlightjs-css';
+            highlightCSS.rel = 'stylesheet';
+            highlightCSS.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css';
+            document.head.appendChild(highlightCSS);
+            
+            const highlightJS = document.createElement('script');
+            highlightJS.src = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js';
+            document.head.appendChild(highlightJS);
+        }
         
-        // If the object already has a script, load it
+        // Create editable code element
+        const codeEditor = document.createElement('div');
+        codeEditor.className = 'code-editor';
+        codeEditor.contentEditable = 'true';
+        codeEditor.spellcheck = false;
+        
+        // Improve code editor behavior
+        codeEditor.addEventListener('keydown', (e) => {
+            // Preserve tab keypresses for indentation
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                document.execCommand('insertHTML', false, '    ');
+            }
+            
+            // Ensure proper handling of Enter key
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.execCommand('insertLineBreak');
+                return false;
+            }
+        });
+        
+        // Prevent keyboard from closing on mobile
+        codeEditor.addEventListener('blur', (e) => {
+            // Prevent losing focus on mobile
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                e.preventDefault();
+                setTimeout(() => codeEditor.focus(), 100);
+            }
+        });
+        
+        // Prevent div wrapping from causing odd behavior
+        codeEditor.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
+        });
+        
+        // Set initial content
         if (obj.script) {
-            scriptArea.value = obj.script;
+            codeEditor.textContent = obj.script;
         } else {
             // Default template
-            scriptArea.value = `// Script for ${obj.name}
+            codeEditor.textContent = `// Script for ${obj.name}
 
 // Called once when script is initialized
 awake() {
@@ -176,6 +198,45 @@ onDisable() {
 }`;
         }
         
+        editorContainer.appendChild(codeEditor);
+        
+        // Initialize syntax highlighting after a short delay
+        setTimeout(() => {
+            if (window.hljs) {
+                // Add JavaScript class for highlighting
+                codeEditor.className = 'code-editor language-javascript';
+                window.hljs.highlightElement(codeEditor);
+                
+                // Handle content changes and rehighlight
+                codeEditor.addEventListener('input', () => {
+                    // Store cursor position
+                    const selection = window.getSelection();
+                    const range = selection.getRangeAt(0);
+                    const offset = range.startOffset;
+                    const node = range.startContainer;
+                    
+                    // Re-highlight on content change
+                    if (window.hljs) {
+                        window.hljs.highlightElement(codeEditor);
+                    }
+                    
+                    // Restore cursor position after highlighting
+                    try {
+                        setTimeout(() => {
+                            selection.removeAllRanges();
+                            const newRange = document.createRange();
+                            newRange.setStart(node, offset);
+                            newRange.setEnd(node, offset);
+                            selection.addRange(newRange);
+                        }, 0);
+                    } catch (e) {
+                        // Fall back if exact position can't be restored
+                        codeEditor.focus();
+                    }
+                });
+            }
+        }, 500);
+        
         // Buttons container
         const buttonContainer = document.createElement('div');
         buttonContainer.className = 'script-editor-buttons';
@@ -187,7 +248,8 @@ onDisable() {
         testBtn.addEventListener('click', () => {
             // Use the scripting system to validate the syntax
             try {
-                const result = this.engine.scriptingSystem.validateScript(scriptArea.value);
+                const scriptContent = codeEditor.textContent || '';
+                const result = this.engine.scriptingSystem.validateScript(scriptContent);
                 if (result.valid) {
                     alert('Script syntax is valid!');
                 } else {
@@ -205,7 +267,7 @@ onDisable() {
         reloadBtn.className = 'script-editor-button';
         reloadBtn.addEventListener('click', () => {
             // Save the script
-            obj.script = scriptArea.value;
+            obj.script = codeEditor.textContent || '';
             
             // If already playing, reload the script - preserving properties
             if (this.engine.isPlaying && obj.scriptInstance) {
@@ -232,7 +294,8 @@ onDisable() {
         saveBtn.textContent = 'Save Script';
         saveBtn.className = 'script-editor-button script-editor-save';
         saveBtn.addEventListener('click', () => {
-            obj.script = scriptArea.value;
+            obj.script = codeEditor.textContent || '';
+            obj.scriptFileName = `${obj.name}.js`;
             document.body.removeChild(modal);
             
             // Tell UI to update
@@ -240,6 +303,15 @@ onDisable() {
                 detail: { object: obj } 
             });
             document.dispatchEvent(event);
+            
+            // Offer to download the script file
+            const blob = new Blob([obj.script], {type: 'text/javascript'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = obj.scriptFileName;
+            a.click();
+            URL.revokeObjectURL(url);
             
             alert('Script saved successfully');
         });
@@ -251,8 +323,7 @@ onDisable() {
         
         // Build modal
         scriptEditorContent.appendChild(header);
-        scriptEditorContent.appendChild(infoBanner);
-        scriptEditorContent.appendChild(scriptArea);
+        scriptEditorContent.appendChild(editorContainer);
         scriptEditorContent.appendChild(buttonContainer);
         modal.appendChild(scriptEditorContent);
         

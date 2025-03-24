@@ -151,6 +151,140 @@
         .nav a:hover {
             background-color: #3a70ee;
         }
+        
+        .class-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .class-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .class-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .class-name {
+            color: #4b80ff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .class-description {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .class-methods {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .method-list {
+            list-style-type: none;
+            padding-left: 10px;
+        }
+        
+        .class-system {
+            display: inline-block;
+            font-size: 11px;
+            background-color: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 5px;
+            color: #666;
+        }
+        
+        .steps-container {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4b80ff;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .steps-container ol {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        
+        .steps-container li {
+            margin-bottom: 10px;
+        }
+        
+        .steps-container img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .code-block pre {
+            margin: 0;
+        }
+        
+        .class-hierarchy {
+            margin: 20px 0;
+        }
+        
+        .hierarchy-node {
+            padding: 5px 0 5px 20px;
+            position: relative;
+        }
+        
+        .hierarchy-node::before {
+            content: "└─";
+            position: absolute;
+            left: 0;
+            color: #999;
+        }
+        
+        .class-index {
+            column-count: 3;
+            column-gap: 20px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .class-index {
+                column-count: 2;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .class-index {
+                column-count: 1;
+            }
+        }
+        
+        .class-index a {
+            display: block;
+            padding: 3px 0;
+            color: #4b80ff;
+            text-decoration: none;
+        }
+        
+        .class-index a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -166,7 +300,22 @@
     <div class="toc">
         <h3>Table of Contents</h3>
         <ul>
-            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#getting-started">Getting Started</a>
+                <ul>
+                    <li><a href="#installation">Installation & Setup</a></li>
+                    <li><a href="#first-project">Your First Project</a></li>
+                    <li><a href="#user-interface">Editor User Interface</a></li>
+                </ul>
+            </li>
+            <li><a href="#class-reference">Class Reference</a>
+                <ul>
+                    <li><a href="#core-classes">Core Engine Classes</a></li>
+                    <li><a href="#system-classes">System Classes</a></li>
+                    <li><a href="#component-classes">Component Classes</a></li>
+                    <li><a href="#behavior-classes">Behavior Classes</a></li>
+                    <li><a href="#utility-classes">Utility Classes</a></li>
+                </ul>
+            </li>
             <li><a href="#scripting">Scripting System</a>
                 <ul>
                     <li><a href="#script-lifecycle">Script Lifecycle</a></li>
@@ -215,24 +364,786 @@
     <div id="getting-started" class="section">
         <h2>Getting Started</h2>
         <p>
-            Welcome to the Three.js Game Engine! This documentation will guide you through 
-            creating scripts and working with the engine's features.
+            Welcome to the Three.js Game Engine! This comprehensive guide will help you
+            get up and running with creating interactive 3D applications and games using our engine.
         </p>
+        
+        <div id="installation" class="subsection">
+            <h3>Installation & Setup</h3>
+            <p>
+                The Three.js Game Engine is a web-based editor and runtime that works directly in your browser.
+                There are two ways to get started:
+            </p>
+            
+            <div class="steps-container">
+                <h4>Option 1: Use the Online Editor</h4>
+                <ol>
+                    <li>Navigate to our online editor at <a href="https://three-js-game-engine.web.app">https://three-js-game-engine.web.app</a></li>
+                    <li>You can start creating immediately with no installation required</li>
+                    <li>Your projects can be exported as ZIP files to save locally</li>
+                </ol>
+                
+                <h4>Option 2: Local Development Setup</h4>
+                <ol>
+                    <li>Clone the repository: <code>git clone https://github.com/yourname/three-js-game-engine.git</code></li>
+                    <li>Navigate to the project directory: <code>cd three-js-game-engine</code></li>
+                    <li>Open index.html in your browser, or use a local server:
+                        <pre class="code-block"><code>npx http-server</code></pre>
+                    </li>
+                    <li>Access the engine at <code>http://localhost:8080</code></li>
+                </ol>
+            </div>
+            
+            <div class="note">
+                <p><strong>Note:</strong> For the best development experience, we recommend using a modern browser like Chrome, Firefox, or Edge. Some features may not work properly in older browsers.</p>
+            </div>
+        </div>
+        
+        <div id="first-project" class="subsection">
+            <h3>Your First Project</h3>
+            <p>
+                Let's create a simple project to get familiar with the engine. We'll create a spinning cube that changes color when clicked.
+            </p>
+            
+            <div class="steps-container">
+                <ol>
+                    <li>
+                        <strong>Create a Cube</strong><br>
+                        Click the "Add Cube" button in the toolbar to add a cube to the scene.
+                    </li>
+                    <li>
+                        <strong>Select the Cube</strong><br>
+                        Click on the cube in the viewport or in the scene hierarchy panel to select it.
+                    </li>
+                    <li>
+                        <strong>Add a Script</strong><br>
+                        With the cube selected, click the "Script" button in the toolbar or the "Add Component" button and select "Script".
+                    </li>
+                    <li>
+                        <strong>Write Your First Script</strong><br>
+                        In the script editor, paste the following code:
+                        <pre class="code-block"><code>// SpinningCube script
+
+// Called once when script is initialized
+awake() {
+    console.log("Cube initialized");
+    
+    // Set up properties with default values
+    this.setProperty('rotationSpeed', 1.0);
+    this.setProperty('hoverColor', '#ff4b4b');
+    this.setProperty('defaultColor', '#4b80ff');
+    
+    // Store original material color
+    this.originalColor = this.transform.material.color.clone();
+}
+
+// Called right before first update frame
+start() {
+    // Get saved properties or use defaults
+    this.rotationSpeed = this.getProperty('rotationSpeed', 1.0);
+    this.hoverColor = this.getProperty('hoverColor', '#ff4b4b');
+    this.defaultColor = this.getProperty('defaultColor', '#4b80ff');
+    
+    // Set initial color
+    this.transform.material.color.set(this.defaultColor);
+    
+    // Listen for mouse events
+    this.on('mousedown', this.handleMouseDown);
+}
+
+// Called every frame during play mode
+update(deltaTime) {
+    // Rotate the cube
+    this.transform.rotation.y += this.rotationSpeed * deltaTime;
+    this.transform.rotation.x += this.rotationSpeed * 0.5 * deltaTime;
+}
+
+// Handle mouse click
+handleMouseDown(data) {
+    console.log("Cube clicked!");
+    
+    // Change color when clicked
+    if (this.transform.material.color.getHex() === new THREE.Color(this.defaultColor).getHex()) {
+        this.transform.material.color.set(this.hoverColor);
+    } else {
+        this.transform.material.color.set(this.defaultColor);
+    }
+    
+    // Create a scaling animation
+    this.startCoroutine(this.pulseAnimation());
+}
+
+// Coroutine for pulse animation
+*pulseAnimation() {
+    const originalScale = this.transform.scale.clone();
+    const pulseScale = originalScale.clone().multiplyScalar(1.2);
+    
+    // Scale up
+    let t = 0;
+    while (t < 0.1) {
+        t += yield;
+        const progress = t / 0.1;
+        this.transform.scale.lerpVectors(originalScale, pulseScale, progress);
+    }
+    
+    // Scale down
+    t = 0;
+    while (t < 0.1) {
+        t += yield;
+        const progress = t / 0.1;
+        this.transform.scale.lerpVectors(pulseScale, originalScale, progress);
+    }
+}</code></pre>
+                    </li>
+                    <li>
+                        <strong>Save the Script</strong><br>
+                        Click "Save Script" to apply the script to the cube.
+                    </li>
+                    <li>
+                        <strong>Enter Play Mode</strong><br>
+                        Click the "Play" button in the toolbar. You should see the cube rotating. Click on it to see it change color and pulse!
+                    </li>
+                    <li>
+                        <strong>Stop Play Mode</strong><br>
+                        When you're done, click the "Stop" button to return to edit mode.
+                    </li>
+                </ol>
+            </div>
+            
+            <p>
+                Congratulations! You've created your first interactive 3D object with the Three.js Game Engine.
+                This simple example demonstrates several core concepts:
+            </p>
+            <ul>
+                <li>Script lifecycle (awake, start, update)</li>
+                <li>Property serialization (setProperty, getProperty)</li>
+                <li>Event handling (on, handleMouseDown)</li>
+                <li>Coroutines for animations (startCoroutine, pulseAnimation)</li>
+            </ul>
+        </div>
+        
+        <div id="user-interface" class="subsection">
+            <h3>Editor User Interface</h3>
+            <p>
+                The Three.js Game Engine editor is organized into several panels and toolbars:
+            </p>
+            
+            <h4>Main Areas</h4>
+            <ul>
+                <li><strong>Viewport</strong> - Central area where you can see and interact with your 3D scene</li>
+                <li><strong>Scene Hierarchy</strong> - Left panel showing all objects in your scene in a tree view</li>
+                <li><strong>Inspector</strong> - Right panel showing properties of the selected object</li>
+                <li><strong>Console</strong> - Bottom panel showing log output and errors</li>
+                <li><strong>Toolbar</strong> - Contains buttons for common actions like adding objects and playing/pausing</li>
+                <li><strong>Main Toolbar</strong> - Top toolbar with tabs for different categories of functions</li>
+            </ul>
+            
+            <h4>Key Features</h4>
+            <ul>
+                <li>
+                    <strong>Object Selection</strong><br>
+                    As you hover over parts and models in the viewport, they are outlined to indicate their potential selection. You can select an outlined object by clicking it.
+                </li>
+                <li>
+                    <strong>Transform Controls</strong><br>
+                    When an object is selected, you can use the transform tools to move, rotate, or scale it. Use the buttons in the toolbar or keyboard shortcuts:
+                    <ul>
+                        <li>G - Translate (move)</li>
+                        <li>R - Rotate</li>
+                        <li>S - Scale</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Play Mode</strong><br>
+                    Click the Play button to run your scene. In Play mode, scripts are executed and physics are simulated.
+                </li>
+                <li>
+                    <strong>Scripting</strong><br>
+                    Add scripts to objects to define their behavior. Scripts can be edited in the built-in script editor.
+                </li>
+                <li>
+                    <strong>Component System</strong><br>
+                    Add components to objects to give them additional functionality. Click the "Add Components" button in the scene hierarchy panel.
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="class-reference" class="section">
+        <h2>Class Reference</h2>
         <p>
-            The engine uses a component-based architecture where scripts can be attached to objects
-            to define their behavior. Scripts have access to the object's transform, the engine
-            itself, and various systems for input, events, physics, and more.
+            The Three.js Game Engine is built with a modular architecture consisting of several classes that work together.
+            Here's a comprehensive list of the classes available in the engine:
         </p>
-        <p>
-            To create a script:
-        </p>
-        <ol>
-            <li>Select an object in the scene hierarchy</li>
-            <li>Click the "Script" button in the toolbar</li>
-            <li>Write your script logic</li>
-            <li>Save the script</li>
-            <li>Enter Play mode to see your script in action</li>
-        </ol>
+        
+        <div class="class-index">
+            <h3>Quick Index</h3>
+            <a href="#GameEngine">GameEngine</a>
+            <a href="#AssetSystem">AssetSystem</a>
+            <a href="#EventSystem">EventSystem</a>
+            <a href="#InputSystem">InputSystem</a>
+            <a href="#MaterialSystem">MaterialSystem</a>
+            <a href="#ShaderSystem">ShaderSystem</a>
+            <a href="#ScriptingSystem">ScriptingSystem</a>
+            <a href="#ECSManager">ECSManager</a>
+            <a href="#EngineUI">EngineUI</a>
+            <a href="#Component">Component</a>
+            <a href="#Entity">Entity</a>
+            <a href="#TransformComponent">TransformComponent</a>
+            <a href="#RenderComponent">RenderComponent</a>
+            <a href="#PhysicsComponent">PhysicsComponent</a>
+            <a href="#Behavior">Behavior</a>
+            <a href="#Rotator">Rotator</a>
+            <a href="#Oscillator">Oscillator</a>
+            <a href="#Follower">Follower</a>
+            <a href="#LookAt">LookAt</a>
+            <a href="#Orbit">Orbit</a>
+            <a href="#Timer">Timer</a>
+            <a href="#PhysicsBody">PhysicsBody</a>
+            <a href="#InputController">InputController</a>
+            <a href="#CameraController">CameraController</a>
+            <a href="#WaypointFollower">WaypointFollower</a>
+            <a href="#AnimationController">AnimationController</a>
+            <a href="#StateMachine">StateMachine</a>
+            <a href="#Tween">Tween</a>
+            <a href="#GameLoop">GameLoop</a>
+            <a href="#CacheManager">CacheManager</a>
+            <a href="#ScriptEditor">ScriptEditor</a>
+            <a href="#QuadTree">QuadTree</a>
+        </div>
+        
+        <div id="core-classes">
+            <h3>Core Engine Classes</h3>
+            <div class="class-list">
+                <div id="GameEngine" class="class-card">
+                    <div class="class-name">GameEngine</div>
+                    <div class="class-description">
+                        The main engine class that manages the 3D scene, rendering, physics, and subsystems.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>constructor()</li>
+                            <li>update()</li>
+                            <li>togglePlayMode()</li>
+                            <li>addCube(), addSphere(), addLight()</li>
+                            <li>selectObject(obj)</li>
+                            <li>saveScene(), loadScene()</li>
+                            <li>savePrefab(), instantiatePrefab()</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="EngineUI" class="class-card">
+                    <div class="class-name">EngineUI</div>
+                    <div class="class-description">
+                        Manages the user interface of the editor, including panels, toolbars, and user interactions.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>constructor(engine)</li>
+                            <li>initSceneTree()</li>
+                            <li>refreshSceneTree()</li>
+                            <li>updateInspector(obj)</li>
+                            <li>initToolbar()</li>
+                            <li>openScriptEditor(obj)</li>
+                            <li>openComponentBrowser(obj)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="Entity" class="class-card">
+                    <div class="class-name">Entity</div>
+                    <div class="class-description">
+                        An entity in the ECS architecture, representing a game object with components.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>constructor(engine, obj)</li>
+                            <li>addComponent(componentType, ...args)</li>
+                            <li>getComponent(componentType)</li>
+                            <li>removeComponent(componentType)</li>
+                            <li>hasComponent(componentType)</li>
+                            <li>updateComponents(deltaTime)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="system-classes">
+            <h3>System Classes</h3>
+            <div class="class-list">
+                <div id="AssetSystem" class="class-card">
+                    <div class="class-name">AssetSystem</div>
+                    <div class="class-description">
+                        Manages the loading, caching, and unloading of assets such as textures, models, and audio.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>load(url, type, options)</li>
+                            <li>get(url, type)</li>
+                            <li>isLoaded(url, type)</li>
+                            <li>unload(url, type)</li>
+                            <li>createMaterialFromTexture()</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="EventSystem" class="class-card">
+                    <div class="class-name">EventSystem</div>
+                    <div class="class-description">
+                        Provides a pub/sub event system for communication between engine components and scripts.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>on(eventName, callback, context)</li>
+                            <li>once(eventName, callback, context)</li>
+                            <li>off(eventName, callback, context)</li>
+                            <li>emit(eventName, data)</li>
+                            <li>queue(eventName, data)</li>
+                            <li>processQueue()</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="InputSystem" class="class-card">
+                    <div class="class-name">InputSystem</div>
+                    <div class="class-description">
+                        Handles user input from keyboard, mouse, touch, and gamepads in a unified system.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>isKeyPressed(keyCode)</li>
+                            <li>isKeyDown(keyCode)</li>
+                            <li>isKeyUp(keyCode)</li>
+                            <li>getMousePosition()</li>
+                            <li>getMouseWorldPosition()</li>
+                            <li>isMouseButtonPressed(button)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="MaterialSystem" class="class-card">
+                    <div class="class-name">MaterialSystem</div>
+                    <div class="class-description">
+                        Manages materials and provides presets and utilities for PBR rendering.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>registerMaterialPreset(name, preset)</li>
+                            <li>createMaterialFromPreset(presetName, overrides)</li>
+                            <li>createMaterial(type, parameters)</li>
+                            <li>loadTexturesForMaterial(material, textures)</li>
+                            <li>serializeMaterial(material)</li>
+                            <li>createEnvironmentMap(path, isEquirectangular)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="ShaderSystem" class="class-card">
+                    <div class="class-name">ShaderSystem</div>
+                    <div class="class-description">
+                        Manages shader creation, shader materials, and post-processing effects.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>registerShader(name, shader)</li>
+                            <li>createShaderMaterial(shader, uniforms, parameters)</li>
+                            <li>update(deltaTime)</li>
+                            <li>createPostProcessingEffect(effectType, parameters)</li>
+                            <li>createShaderFromChunks(options)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="ScriptingSystem" class="class-card">
+                    <div class="class-name">ScriptingSystem</div>
+                    <div class="class-description">
+                        Manages runtime script execution, handles script lifecycle, and provides scripting utilities.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>createScriptInstance(obj)</li>
+                            <li>initializeScripts()</li>
+                            <li>updateScripts(deltaTime)</li>
+                            <li>hotReloadScript(obj)</li>
+                            <li>validateScript(scriptCode)</li>
+                            <li>getObjectsByTag(tag)</li>
+                            <li>addTag(obj, tag)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="ECSManager" class="class-card">
+                    <div class="class-name">ECSManager</div>
+                    <div class="class-description">
+                        Manages the Entity-Component System architecture for modular game object composition.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>registerComponent(componentType)</li>
+                            <li>createEntity(obj)</li>
+                            <li>getEntity(id)</li>
+                            <li>removeEntity(id)</li>
+                            <li>initializeEntities()</li>
+                            <li>queryEntities(...componentTypes)</li>
+                            <li>queryArea(x, z, width, height)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="component-classes">
+            <h3>Component Classes</h3>
+            <div class="class-list">
+                <div id="Component" class="class-card">
+                    <div class="class-name">Component</div>
+                    <div class="class-description">
+                        Base class for all components in the ECS architecture.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>onAttach(entity)</li>
+                            <li>onDetach()</li>
+                            <li>awake()</li>
+                            <li>start()</li>
+                            <li>update(deltaTime)</li>
+                            <li>lateUpdate(deltaTime)</li>
+                            <li>setProperty(name, value)</li>
+                            <li>getProperty(name, defaultValue)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="TransformComponent" class="class-card">
+                    <div class="class-name">TransformComponent</div>
+                    <div class="class-description">
+                        Handles position, rotation, and scale of an entity.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>setPosition(x, y, z)</li>
+                            <li>setRotation(x, y, z)</li>
+                            <li>setScale(x, y, z)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="RenderComponent" class="class-card">
+                    <div class="class-name">RenderComponent</div>
+                    <div class="class-description">
+                        Handles rendering properties of an entity such as materials and visibility.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>setVisible(visible)</li>
+                            <li>setMaterialProperty(property, value)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="PhysicsComponent" class="class-card">
+                    <div class="class-name">PhysicsComponent</div>
+                    <div class="class-description">
+                        Provides physics simulation for an entity including velocity, gravity, and collision.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>applyForce(force)</li>
+                            <li>setVelocity(x, y, z)</li>
+                            <li>update(deltaTime)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="behavior-classes">
+            <h3>Behavior Classes</h3>
+            <div class="class-list">
+                <div id="Behavior" class="class-card">
+                    <div class="class-name">Behavior</div>
+                    <div class="class-description">
+                        Base class for all behaviors that can be attached to scripts.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>update(deltaTime)</li>
+                            <li>enable()</li>
+                            <li>disable()</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="Rotator" class="class-card">
+                    <div class="class-name">Rotator</div>
+                    <div class="class-description">
+                        Behavior that rotates an object along specified axes at given speeds.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>setSpeed(axis, value)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="Oscillator" class="class-card">
+                    <div class="class-name">Oscillator</div>
+                    <div class="class-description">
+                        Behavior that makes an object move back and forth along an axis.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>resetStartPosition()</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="Follower" class="class-card">
+                    <div class="class-name">Follower</div>
+                    <div class="class-description">
+                        Behavior that makes an object follow a target at a specified speed.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>setTarget(target)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="LookAt" class="class-card">
+                    <div class="class-name">LookAt</div>
+                    <div class="class-description">
+                        Behavior that makes an object continuously face a target.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>update(deltaTime)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="Orbit" class="class-card">
+                    <div class="class-name">Orbit</div>
+                    <div class="class-description">
+                        Behavior that makes an object orbit around a target.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>update(deltaTime)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="Timer" class="class-card">
+                    <div class="class-name">Timer</div>
+                    <div class="class-description">
+                        Behavior that executes a callback after a specified time delay.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>reset()</li>
+                            <li>update(deltaTime)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="PhysicsBody" class="class-card">
+                    <div class="class-name">PhysicsBody</div>
+                    <div class="class-description">
+                        Behavior that adds physical properties like mass, gravity, and collision response.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>applyForce(force)</li>
+                            <li>applyImpulse(impulse)</li>
+                            <li>setVelocity(x, y, z)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="InputController" class="class-card">
+                    <div class="class-name">InputController</div>
+                    <div class="class-description">
+                        Behavior that handles keyboard input for standard character movement.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>update(deltaTime)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="CameraController" class="class-card">
+                    <div class="class-name">CameraController</div>
+                    <div class="class-description">
+                        Behavior that controls camera movement with multiple modes.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>setTarget(target)</li>
+                            <li>setOffset(x, y, z)</li>
+                            <li>setCameraType(type)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="WaypointFollower" class="class-card">
+                    <div class="class-name">WaypointFollower</div>
+                    <div class="class-description">
+                        Behavior that makes an object follow a path of waypoints.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>addWaypoint(position)</li>
+                            <li>clearWaypoints()</li>
+                            <li>update(deltaTime)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="AnimationController" class="class-card">
+                    <div class="class-name">AnimationController</div>
+                    <div class="class-description">
+                        Behavior that manages and blends animations for a model.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>play(clipName, options)</li>
+                            <li>stop(clipName)</li>
+                            <li>getAction(clipName)</li>
+                            <li>setTimeScale(timeScale)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="StateMachine" class="class-card">
+                    <div class="class-name">StateMachine</div>
+                    <div class="class-description">
+                        Behavior that manages state transitions for complex logic and animations.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>addState(name, callbacks)</li>
+                            <li>transition(stateName)</li>
+                            <li>getCurrentState()</li>
+                            <li>isInState(stateName)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="utility-classes">
+            <h3>Utility Classes</h3>
+            <div class="class-list">
+                <div id="Tween" class="class-card">
+                    <div class="class-name">Tween</div>
+                    <div class="class-description">
+                        Handles smooth interpolation between property values over time.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>update(deltaTime)</li>
+                            <li>stop()</li>
+                            <li>resume()</li>
+                            <li>reset()</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="GameLoop" class="class-card">
+                    <div class="class-name">GameLoop</div>
+                    <div class="class-description">
+                        Manages update callbacks and provides fixed timestep updates for physics.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>addCallback(type, callback, context)</li>
+                            <li>removeCallback(type, callback, context)</li>
+                            <li>update(deltaTime)</li>
+                            <li>setFixedTimeStep(timeStep)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="CacheManager" class="class-card">
+                    <div class="class-name">CacheManager</div>
+                    <div class="class-description">
+                        Manages a cache of data with automatic expiration and memory management.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>set(key, value, expirySeconds)</li>
+                            <li>get(key)</li>
+                            <li>has(key)</li>
+                            <li>remove(key)</li>
+                            <li>clear()</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="ScriptEditor" class="class-card">
+                    <div class="class-name">ScriptEditor</div>
+                    <div class="class-description">
+                        Provides a code editor for creating and editing scripts.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>openScriptEditor(obj)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="QuadTree" class="class-card">
+                    <div class="class-name">QuadTree</div>
+                    <div class="class-description">
+                        Spatial partitioning data structure for efficient collision detection and spatial queries.
+                    </div>
+                    <div class="class-methods">
+                        Key Methods:
+                        <ul class="method-list">
+                            <li>insert(rect)</li>
+                            <li>query(range, found)</li>
+                            <li>clear()</li>
+                            <li>visualize(scene)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div id="scripting" class="section">
@@ -1551,7 +2462,7 @@ createDefaultTarget() {
         roughness: 0.5
     });
     
-    const cube = this.createObject('box', material, new THREE.Vector3(5, 0, 5));
+    const cube = this.createObject('box', material, new THREE.Vector3(0, 0, 0));
     
     // Create an engine object reference
     const targetObj = this.engine.getObjectByThreeJsObject(cube);
@@ -1842,7 +2753,7 @@ const waypoints = [
 
 // Create follower with options
 const path = this.addBehavior(this.Behaviors.WaypointFollower, waypoints, {
-    speed: 2.0,
+    speed: 2,
     waypointRadius: 0.5,  // How close to get to each point
     loop: true  // Whether to loop back to start
 });
@@ -2316,7 +3227,7 @@ update(deltaTime) {
         this.velocity.x *= 0.9;
     }
     
-    // Jump only when grounded
+    // Jumping
     if (this.isKeyDown('Space') && this.isGrounded) {
         this.velocity.y = 10;
         this.isGrounded = false;
